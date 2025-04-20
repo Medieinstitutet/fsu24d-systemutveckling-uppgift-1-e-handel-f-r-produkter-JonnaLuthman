@@ -131,6 +131,119 @@ export const connectDB = async () => {
     res.send({ "Customer updated": customer });
   });
 
+  // Orders API endpoints
+  const ordersCollection = await database.collection("orders");
+
+  app.get("/orders", async (req, res) => {
+    try {
+      const orders = await ordersCollection.find().toArray();
+
+      if (!orders) {
+        return res.status(404).send({ error: "Could not fetch orders" });
+      }
+      res.send(orders);
+    } catch (error) {
+      console.error("Error");
+      res.status(500).send({ error: "Internal Server Error" });
+    }
+  });
+
+  app.get("/orders/:id", async (req, res) => {
+    const ordersId = req.params.id;
+
+    try {
+      const order = await ordersCollection.findOne({
+        _id: new ObjectId(ordersId),
+      });
+
+      if (!order) {
+        return res.status(404).send({ error: "Order not found" });
+      }
+
+      res.send(order);
+    } catch (error) {
+      console.error("Error");
+      res.status(500).send({ error: "Internal Server Error" });
+    }
+  });
+
+  app.post("/orders", async (req, res) => {
+    const {
+      customer_id,
+      total_price,
+      payment_status,
+      order_status,
+      order_items,
+      created_at,
+    } = req.body;
+
+    if (
+      !customer_id ||
+      !total_price ||
+      !payment_status ||
+      !order_status ||
+      !order_items ||
+      !created_at
+    ) {
+      return res.status(400).send({ error: "All fields are required" });
+    }
+
+    const newOrder = {
+      customer_id,
+      total_price,
+      payment_status,
+      order_status,
+      order_items,
+      created_at,
+    };
+
+    try {
+      const result = await ordersCollection.insertOne(newOrder);
+      res.send({ message: "order created", id: result.insertedId });
+    } catch (error) {
+      console.error("Error creating order:", error);
+      res.status(500).send({ error: "Internal Server Error" });
+    }
+  });
+
+  app.delete("/orders/:id", async (req, res) => {
+    const ordersId = req.params.id;
+
+    try {
+      const result = await ordersCollection.deleteOne({
+        _id: new ObjectId(ordersId),
+      });
+
+      if (result.deletedCount === 0) {
+        return res.status(400).send({ error: "Could not find order" });
+      }
+      res.send({ "Order deleted": result });
+    } catch (error) {
+      console.error("Error creating order:", error);
+      res.status(500).send({ error: "Internal Server Error" });
+    }
+  });
+
+  app.patch("/orders/:id", async (req, res) => {
+    const orderId = req.params.id;
+    const filter = { _id: new ObjectId(orderId) };
+
+    const orderProperties = req.body;
+
+    const updatedOrder = {
+      $set: orderProperties,
+    };
+
+    const result = await ordersCollection.updateOne(filter, updatedOrder);
+    const order = await ordersCollection.findOne(filter);
+
+    if (result.matchedCount === 0) {
+      return res.status(404).send({ error: "Order not found" });
+    }
+
+    res.send({ "Order updated": order });
+  });
+
   app.listen(4000, () => {
     console.log("Server started");
   });
