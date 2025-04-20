@@ -121,14 +121,22 @@ export const connectDB = async () => {
       $set: customerProperties,
     };
 
-    const result = await customersCollection.updateOne(filter, updatedcustomer);
-    const customer = await customersCollection.findOne(filter);
+    try {
+      const result = await customersCollection.updateOne(
+        filter,
+        updatedcustomer
+      );
+      const customer = await customersCollection.findOne(filter);
 
-    if (result.matchedCount === 0) {
-      return res.status(404).send({ error: "Customer not found" });
+      if (result.matchedCount === 0) {
+        return res.status(404).send({ error: "Customer not found" });
+      }
+
+      res.send({ "Customer updated": customer });
+    } catch (error) {
+      console.error("Error creating customer:", error);
+      res.status(500).send({ error: "Internal Server Error" });
     }
-
-    res.send({ "Customer updated": customer });
   });
 
   // Orders API endpoints
@@ -234,14 +242,126 @@ export const connectDB = async () => {
       $set: orderProperties,
     };
 
-    const result = await ordersCollection.updateOne(filter, updatedOrder);
-    const order = await ordersCollection.findOne(filter);
+    try {
+      const result = await ordersCollection.updateOne(filter, updatedOrder);
+      const order = await ordersCollection.findOne(filter);
 
-    if (result.matchedCount === 0) {
-      return res.status(404).send({ error: "Order not found" });
+      if (result.matchedCount === 0) {
+        return res.status(404).send({ error: "Order not found" });
+      }
+
+      res.send({ "Order updated": order });
+    } catch (error) {
+      console.error("Error creating order:", error);
+      res.status(500).send({ error: "Internal Server Error" });
+    }
+  });
+
+  // Products API endpoints
+  const productsCollection = await database.collection("products");
+
+  app.get("/products", async (req, res) => {
+    try {
+      const products = await productsCollection.find().toArray();
+
+      if (!products) {
+        return res.status(404).send({ error: "Could not fetch products" });
+      }
+      res.send(products);
+    } catch (error) {
+      console.error("Error");
+      res.status(500).send({ error: "Internal Server Error" });
+    }
+  });
+
+  app.get("/products/:id", async (req, res) => {
+    const productId = req.params.id;
+
+    try {
+      const product = await productsCollection.findOne({
+        _id: new ObjectId(productId),
+      });
+
+      if (!product) {
+        return res.status(404).send({ error: "Product not found" });
+      }
+
+      res.send(product);
+    } catch (error) {
+      console.error("Error");
+      res.status(500).send({ error: "Internal Server Error" });
+    }
+  });
+
+  app.post("/products", async (req, res) => {
+    const { title, stock, description, price } = req.body;
+
+    if (!title || !stock || !description || !price) {
+      return res.status(400).send({ error: "All fields are required" });
     }
 
-    res.send({ "Order updated": order });
+    const newProduct = {
+      title,
+      stock,
+      description,
+      price,
+    };
+
+    try {
+      const result = await productsCollection.insertOne(newProduct);
+      res.send({ message: "Product created", id: result.insertedId });
+    } catch (error) {
+      console.error("Error creating product:", error);
+      res.status(500).send({ error: "Internal Server Error" });
+    }
+  });
+
+  app.delete("/products/:id", async (req, res) => {
+    const productId = req.params.id;
+
+    try {
+      const result = await productsCollection.deleteOne({
+        _id: new ObjectId(productId),
+      });
+
+      if (result.deletedCount === 0) {
+        return res.status(400).send({ error: "Could not find product" });
+      }
+      res.send({ "Product deleted": result });
+    } catch (error) {
+      console.error("Error creating product:", error);
+      res.status(500).send({ error: "Internal Server Error" });
+    }
+  });
+
+  app.patch("/products/:id", async (req, res) => {
+    const productId = req.params.id;
+    const filter = { _id: new ObjectId(productId) };
+
+    const { stock } = req.body;
+
+    const updatedStock = {
+      $set: { stock },
+    };
+    try {
+      const result = await productsCollection.updateOne(filter, updatedStock);
+      const product = await productsCollection.findOne(filter);
+
+      if (typeof stock !== "number" || stock < 0) {
+        return res
+          .status(400)
+          .send({ error: "Stock must be a non-negative number" });
+      }
+
+      if (result.matchedCount === 0) {
+        return res.status(404).send({ error: "Product not found" });
+      }
+
+      res.send({ "Stock updated": product });
+    } catch (error) {
+      console.error("Error creating product:", error);
+      res.status(500).send({ error: "Internal Server Error" });
+    }
   });
 
   app.listen(4000, () => {
