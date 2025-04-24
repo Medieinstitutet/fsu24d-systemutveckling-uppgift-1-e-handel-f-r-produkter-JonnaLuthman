@@ -1,6 +1,6 @@
 import { ObjectId } from "mongodb";
 
-export const toObjectId = (id: string) => {
+export const toObjectId = (id) => {
   try {
     return new ObjectId(id);
   } catch (error) {

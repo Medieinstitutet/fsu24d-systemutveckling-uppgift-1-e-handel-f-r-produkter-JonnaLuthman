@@ -1,6 +1,5 @@
-// models/BaseModel.js
-import { Database } from "../db/Database.js";
-import { toObjectId } from "../utils/objectI.js";
+import { Database } from "../db/DataBase.js";
+import { toObjectId } from "../utils/toObjectId.js";
 
 export class BaseModel {
   constructor(collectionName) {

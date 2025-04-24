@@ -1,5 +1,6 @@
 import { MongoClient } from "mongodb";
 
+
 // const MONGO_DB_URL =
 //   "mongodb+srv://jonnaluthman:zob0SQdGczamZl1x@cluster0.h21qcz9.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
 
