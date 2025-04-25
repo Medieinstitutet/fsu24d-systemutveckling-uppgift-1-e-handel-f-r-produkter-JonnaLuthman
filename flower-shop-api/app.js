@@ -1,4 +1,5 @@
 import express from "express";
+import cors from 'cors';
 import customerRouter from "./src/routes/customers.js";
 import productRouter from "./src/routes/products.js";
 import orderRouter from "./src/routes/orders.js";
@@ -8,6 +9,12 @@ const app = express();
 // Middleware
 // App can read json
 app.use(express.json());
+app.use(
+  cors({
+    origin: "*",
+    credentials: true,
+  })
+);
 
 // Routes
 app.use("/customers", customerRouter);
