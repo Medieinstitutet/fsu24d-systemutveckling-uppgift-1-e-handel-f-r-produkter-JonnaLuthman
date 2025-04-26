@@ -7,9 +7,9 @@ import { Checkout } from "./pages/Checkout/Checkout";
 import { OrderConfirmation } from "./pages/Checkout/OrderConfirmation";
 import { Products } from "./pages/Products";
 import { AdminOrders } from "./pages/Admin/AdminOrders";
-import { AdminProducts } from "./pages/Admin/AdminProducts";
 import { CheckoutPayment } from "./pages/Checkout/CheckoutPayment";
 import { ContactUs } from "./pages/ContactUs";
+import AdminProducts from "./pages/Admin/AdminProducts";
 
 export const router = createBrowserRouter([
   {
@@ -48,6 +48,10 @@ export const router = createBrowserRouter([
       {
         path: "/contact-us",
         element: <ContactUs />,
+      },
+      {
+        path: "/order-confirmation",
+        element: <OrderConfirmation />,
       },
     ],
   },
