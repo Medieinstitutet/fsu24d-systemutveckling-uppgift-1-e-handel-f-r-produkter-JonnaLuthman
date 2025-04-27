@@ -1,0 +1,48 @@
+.navbar > ul {
+  list-style: none;
+  display: flex;
+  gap: 3rem;
+  margin: 0;
+  padding: 2rem;
+}
+
+.navbar li {
+  position: relative;
+}
+
+.navbar a,
+.navbar span {
+  text-decoration: none;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+/* Dropdown hidden by default */
+.dropdown-content {
+  display: none;
+  position: absolute;
+  background: #1a1a1a;
+  top: 100%;
+  left: 0;
+  min-width: 140px;
+  box-shadow: 0 4px 6px rgba(78, 78, 78, 0.1);
+  padding: 5px 0;
+  list-style: none;
+  flex-direction: column;
+  gap: 0;
+  z-index: 1;
+}
+
+/* Show dropdown on hover */
+.dropdown:hover .dropdown-content {
+  display: block;
+}
+
+.dropdown-content li {
+  padding: 5px 10px;
+}
+
+/* Place cart link on right side/end of navbar */
+.cart-link {
+    margin-left: auto;
+}
