@@ -6,28 +6,28 @@ const orderModel = new Order();
 
 export const getAllOrders = async (req, res) => {
   try {
-    const orders = await orderModel.findAllWithItems();
+    const orders = await orderModel.findAllWithDetails();
+    console.log(orders);
     if (!orders) {
       return res.status(404).send({ error: "Could not fetch orders" });
     }
     res.send(orders);
   } catch (error) {
-    console.error("Error");
+    console.error(error);
     res.status(500).send({ error: "Internal Server Error" });
   }
 };
 
 export const getOrderById = async (req, res) => {
   const id = req.params.id;
-
   try {
-    const order = await orderModel.findByIdwithItems(id);
+    const order = await orderModel.findByIdWithDetails(id);
 
     if (!order) {
       return res.status(404).send({ error: "Order not found" });
     }
 
-    res.send(order[0]);
+    res.send(order);
   } catch (error) {
     console.error("Error");
     res.status(500).send({ error: "Internal Server Error" });
@@ -53,10 +53,8 @@ export const createOrder = async (req, res) => {
     payment_status,
     order_status,
     order_items,
-
   } = req.body;
 
-  // ✅ Check that order_items is an array and has at least one item!
   if (
     !customer_id ||
     !total_price ||
@@ -66,11 +64,9 @@ export const createOrder = async (req, res) => {
     !Array.isArray(order_items) ||
     order_items.length === 0
   ) {
-    return res
-      .status(400)
-      .send({
-        error: "All fields are required, including at least one order item.",
-      });
+    return res.status(400).send({
+      error: "All fields are required, including at least one order item.",
+    });
   }
 
   const newOrder = addTimestamps({
@@ -81,10 +77,9 @@ export const createOrder = async (req, res) => {
   });
 
   try {
-    // 1️⃣ Create the order first
+
     const result = await orderModel.create(newOrder);
     const orderId = result.insertedId;
-
 
     if (result.insertedId) {
       const orderItemsData = order_items.map((item) => ({
@@ -125,8 +120,8 @@ export const updateOrder = async (req, res) => {
   const id = req.params.id;
   const data = req.body;
 
-  const orderData = updateTimestamp(data)
-  
+  const orderData = updateTimestamp(data);
+
   try {
     const result = await orderModel.update(id, orderData);
     const updatedOrder = await orderModel.findById(id);

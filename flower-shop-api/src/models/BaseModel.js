@@ -31,4 +31,14 @@ export class BaseModel {
       { $set: data }
     );
   }
+
+  // async save(id, data) {
+  //   if (id) {
+  //     await collection.updateOne({ _id: toObjectId(id)}, { $set: data });
+  //   } else {
+  //     let result = await collection.insertOne(data);
+
+  //     this.id = result.insertedId;
+  //   }
+  // }
 }
