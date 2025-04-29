@@ -1,5 +1,9 @@
-import React from "react";
+import { Cart } from "../../components/Cart/Cart";
 
 export const Checkout = () => {
-  return <div>Checkout</div>;
+  return (
+    <>
+      <Cart />
+    </>
+  );
 };
