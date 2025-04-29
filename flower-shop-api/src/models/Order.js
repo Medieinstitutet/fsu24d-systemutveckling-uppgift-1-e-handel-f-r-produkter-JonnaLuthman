@@ -1,87 +1,115 @@
 import { toObjectId } from "../utils/toObjectId.js";
-import { BaseModel } from "./BaseModel.js";
+import { BaseModel } from "./BaseModel.js"
 
 export class Order extends BaseModel {
   constructor() {
     super("orders");
   }
 
-  async findAllWithItems() {
-    return await this.collection
-      .aggregate([
-        {
-          $lookup: {
-            from: "order_items",
-            localField: "_id",
-            foreignField: "order_id",
-            as: "order_items",
+  getOrderAggregation(orderId = null) {
+    const pipeline = [];
+
+    if (orderId) {
+      pipeline.push({
+        $match: { _id: toObjectId(orderId) },
+      });
+    }
+
+    pipeline.push(
+      {
+        $lookup: {
+          from: "order_items",
+          localField: "_id",
+          foreignField: "order_id",
+          as: "order_items",
+        },
+      },
+      {
+        $addFields: {
+          customer_id: { $toObjectId: "$customer_id" },
+        },
+      },
+      {
+        $lookup: {
+          from: "customers",
+          localField: "customer_id",
+          foreignField: "_id",
+          as: "customer",
+        },
+      },
+      {
+        $unwind: {
+          path: "$customer",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $addFields: {
+          order_items: {
+            $map: {
+              input: "$order_items",
+              as: "item",
+              in: {
+                $mergeObjects: [
+                  "$$item",
+                  { product_id: { $toObjectId: "$$item.product_id" } },
+                ],
+              },
+            },
           },
         },
-      ])
+      },
+      {
+        $unwind: {
+          path: "$order_items",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $lookup: {
+          from: "products",
+          localField: "order_items.product_id",
+          foreignField: "_id",
+          as: "order_items.product",
+        },
+      },
+      {
+        $unwind: {
+          path: "$order_items.product",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $group: {
+          _id: "$_id",
+          customer: { $first: "$customer" },
+          total_price: { $first: "$total_price" },
+          payment_status: { $first: "$payment_status" },
+          order_status: { $first: "$order_status" },
+          created_at: { $first: "$created_at" },
+          order_items: {
+            $push: {
+              quantity: "$order_items.quantity",
+              product: "$order_items.product",
+            },
+          },
+        },
+      }
+    );
+
+    return pipeline;
+  }
+
+  async findAllWithDetails() {
+    return await this.collection
+      .aggregate(this.getOrderAggregation())
       .toArray();
   }
 
-  async findByIdwithItems(orderId) {
-    return await this.collection
-      .aggregate([
-        {
-          $match: { _id: toObjectId(orderId) },
-        },
-        {
-          $lookup: {
-            from: "order_items",
-            localField: "_id",
-            foreignField: "order_id",
-            as: "order_items",
-          },
-        },
-      ])
+  async findByIdWithDetails(orderId) {
+    const result = await this.collection
+      .aggregate(this.getOrderAggregation(orderId))
       .toArray();
-  }
-
-  async findOrderItemsByOrder(orderId) {
-    return await this.collection
-      .aggregate([
-        {
-          $match: { _id: toObjectId(orderId) },
-        },
-
-        {
-          $lookup: {
-            from: "order_items",
-            localField: "_id",
-            foreignField: "order_id",
-            as: "order_item",
-          },
-        },
-        {
-          $unwind: {
-            path: "$order_item",
-          },
-        },
-        {
-          $lookup: {
-            from: "products",
-            localField: "order_item.product_id",
-            foreignField: "_id",
-            as: "order_item.product",
-          },
-        },
-        {
-          $unwind: "$order_item.product",
-        },
-        {
-          $project: {
-            _id: 0,
-            order_item_id: "$order_item._id",
-            quantity: "$order_item.quantity",
-            product_id: "$order_item.product_id",
-            title: "$order_item.product.title",
-            description: "$order_item.product.description",
-            product_price: "$order_item.product.price",
-          },
-        },
-      ])
-      .toArray();
+    return result[0] || null;
   }
 }
