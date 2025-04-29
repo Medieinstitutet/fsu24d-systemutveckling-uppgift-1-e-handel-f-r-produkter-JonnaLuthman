@@ -1,5 +1,5 @@
 import { toObjectId } from "../utils/toObjectId.js";
-import { BaseModel } from "./BaseModel.js";
+import { BaseModel } from "./BaseModel.js"
 
 export class Order extends BaseModel {
   constructor() {

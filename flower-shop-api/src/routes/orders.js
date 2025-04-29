@@ -5,16 +5,14 @@ import {
   deleteOrder,
   getOrderById,
   updateOrder,
-  getOrderItemsByOrder,
 } from "../controllers/orderController.js";
 
 const router = express.Router();
 
 router.get("/", getAllOrders);
 router.get("/:id", getOrderById);
-router.get("/:id/items", getOrderItemsByOrder);
-router.post("/", createOrder);
-router.delete("/:id", deleteOrder);
-router.patch("/:id", updateOrder);
+router.post("/add", createOrder);
+router.delete("/:id/delete", deleteOrder);
+router.patch("/:id/update", updateOrder);
 
 export default router;

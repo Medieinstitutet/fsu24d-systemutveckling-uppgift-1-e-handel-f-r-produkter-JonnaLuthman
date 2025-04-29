@@ -1,8 +1,11 @@
 import { Order } from "../models/Order.js";
 import { OrderItem } from "../models/OrderItem.js";
+import { Cart } from "../models/Cart.js";
 import { addTimestamps, updateTimestamp } from "../utils/timeStamps.js";
 
 const orderModel = new Order();
+const orderItemModel = new OrderItem();
+const cartModel = new Cart();
 
 export const getAllOrders = async (req, res) => {
   try {
@@ -34,68 +37,81 @@ export const getOrderById = async (req, res) => {
   }
 };
 
-export const getOrderItemsByOrder = async (req, res) => {
-  const id = req.params.id;
+export const createOrder = async (req, res) => {
+  const { cart_id, customer_id, payment_status, order_status } = req.body;
+
+  if (!cart_id || !customer_id || !payment_status || !order_status) {
+    return res.status(400).send({
+      error:
+        "Cart ID, customer ID, payment status, and order status are required.",
+    });
+  }
+
   try {
-    const order_items = await orderModel.findOrderItemsByOrder(id);
-    res.send(order_items);
+    const cart = await cartModel.findById(cart_id);
+    if (!cart || !cart.cartItems || cart.cartItems.length === 0) {
+      return res.status(404).send({ error: "Cart not found or empty" });
+    }
+
+
+
+    const total_price = cart.cartItems.reduce(
+      (sum, item) => sum + item.price * item.quantity,
+      0
+    );
+
+    const newOrder = addTimestamps({
+      customer_id,
+      total_price,
+      payment_status,
+      order_status,
+    });
+
+    await orderModel.save(null, newOrder);
+
+    const orderId = orderModel.id;
+    const orderItemsData = cart.cartItems.map((item) => ({
+      order_id: orderId,
+      product_id: item.productId,
+      quantity: item.quantity,
+      price: item.price,
+    }));
+
+    console.log(orderItemsData)
+
+    const result = await orderItemModel.createItems(orderItemsData);
+    console.log(result)
+
+    // await cartModel.delete(cart_id);
+
+    res.send({
+      message: "Order created successfully",
+      orderId,
+      result,
+    });
   } catch (error) {
-    console.error(error);
+    console.error("Error creating order from cart:", error);
     res.status(500).send({ error: "Internal Server Error" });
   }
 };
 
-const orderItemModel = new OrderItem();
-export const createOrder = async (req, res) => {
-  const {
-    customer_id,
-    total_price,
-    payment_status,
-    order_status,
-    order_items,
-  } = req.body;
+export const updateOrder = async (req, res) => {
+  const id = req.params.id;
+  const data = req.body;
 
-  if (
-    !customer_id ||
-    !total_price ||
-    !payment_status ||
-    !order_status ||
-    !order_items ||
-    !Array.isArray(order_items) ||
-    order_items.length === 0
-  ) {
-    return res.status(400).send({
-      error: "All fields are required, including at least one order item.",
-    });
-  }
-
-  const newOrder = addTimestamps({
-    customer_id,
-    total_price,
-    payment_status,
-    order_status,
-  });
+  const orderData = updateTimestamp(data);
 
   try {
+    await orderModel.save(id, orderData);
+    const updatedOrder = await orderModel.findById(id);
 
-    const result = await orderModel.create(newOrder);
-    const orderId = result.insertedId;
-
-    if (result.insertedId) {
-      const orderItemsData = order_items.map((item) => ({
-        order_id: orderId,
-        product_id: item.product_id,
-        quantity: item.quantity,
-      }));
-      await orderItemModel.createMany(orderItemsData);
+    if (!updateOrder) {
+      return res.status(404).send({ error: "Order not found" });
     }
 
-    res.send({
-      message: "Order and order items created successfully",
-      orderId,
-    });
+    res.send({ "Order updated": updatedOrder });
   } catch (error) {
-    console.error("Error creating order:", error);
+    console.error("Error updating order:", error);
     res.status(500).send({ error: "Internal Server Error" });
   }
 };
@@ -110,27 +126,6 @@ export const deleteOrder = async (req, res) => {
       return res.status(400).send({ error: "Could not find order" });
     }
     res.send({ "Order deleted": result });
-  } catch (error) {
-    console.error("Error creating order:", error);
-    res.status(500).send({ error: "Internal Server Error" });
-  }
-};
-
-export const updateOrder = async (req, res) => {
-  const id = req.params.id;
-  const data = req.body;
-
-  const orderData = updateTimestamp(data);
-
-  try {
-    const result = await orderModel.update(id, orderData);
-    const updatedOrder = await orderModel.findById(id);
-
-    if (result.matchedCount === 0) {
-      return res.status(404).send({ error: "Order not found" });
-    }
-
-    res.send({ "Order updated": updatedOrder });
   } catch (error) {
     console.error("Error creating order:", error);
     res.status(500).send({ error: "Internal Server Error" });

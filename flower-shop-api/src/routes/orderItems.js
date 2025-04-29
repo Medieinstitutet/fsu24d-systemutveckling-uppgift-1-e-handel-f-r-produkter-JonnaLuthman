@@ -4,7 +4,7 @@ import { createOrderItem, deleteOrderItem, updateOrderItem } from "../controller
 const router = express.Router();
 
 router.post("/", createOrderItem);
-router.delete("/:id", deleteOrderItem);
-router.patch("/:id", updateOrderItem);
+router.delete("/:id/delete", deleteOrderItem);
+router.patch("/:id/update", updateOrderItem);
 
 export default router;

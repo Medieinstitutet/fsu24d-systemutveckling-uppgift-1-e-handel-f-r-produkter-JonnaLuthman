@@ -17,28 +17,21 @@ export class BaseModel {
     return await this.collection.findOne({ _id: toObjectId(id) });
   }
 
-  async create(data) {
-    return await this.collection.insertOne(data);
-  }
-
   async delete(id) {
     return await this.collection.deleteOne({ _id: toObjectId(id) });
   }
 
-  async update(id, data) {
-    return await this.collection.updateOne(
-      { _id: toObjectId(id) },
-      { $set: data }
-    );
+  async save(id, data) {
+    if (id) {
+      let result = await this.collection.updateOne(
+        { _id: toObjectId(id) },
+        { $set: data }
+      );
+      return result;
+    } else {
+      let result = await this.collection.insertOne(data);
+      this.id = result.insertedId;
+      return result;
+    }
   }
-
-  // async save(id, data) {
-  //   if (id) {
-  //     await collection.updateOne({ _id: toObjectId(id)}, { $set: data });
-  //   } else {
-  //     let result = await collection.insertOne(data);
-
-  //     this.id = result.insertedId;
-  //   }
-  // }
 }
