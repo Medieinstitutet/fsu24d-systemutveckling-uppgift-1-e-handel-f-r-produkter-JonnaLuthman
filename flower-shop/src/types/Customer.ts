@@ -8,6 +8,6 @@ export type Customer = {
     city: string;
 }
 
-export type CustomerCreate = Omit<Customer, "id" | "created_at">
+export type CustomerCreate = Omit<Customer, "_id" | "created_at">
 
 export type CustomerPublic = Omit<CustomerCreate, "password">;
