@@ -58,7 +58,7 @@ export const updateOrder = async (
 
 export const createOrder = async (payload: OrderCreate) => {
   try {
-    const response = await axios.post(`${ORDER_URL}`, payload);
+    const response = await axios.post(`${ORDER_URL}/add`, payload);
     return response.data;
   } catch (error) {
     console.log(error);

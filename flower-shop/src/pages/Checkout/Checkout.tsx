@@ -1,9 +1,9 @@
-import { Cart } from "../../components/Cart/Cart";
+import { CartComp } from "../../components/Cart/CartComp";
 
 export const Checkout = () => {
   return (
     <>
-      <Cart />
+      <CartComp />
     </>
   );
 };

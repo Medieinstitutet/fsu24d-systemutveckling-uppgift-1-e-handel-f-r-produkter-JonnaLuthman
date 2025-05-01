@@ -33,11 +33,9 @@ export const addToCart = async (req, res) => {
     if (!cart) {
       const newCartId = await cartModel.createEmptyCart();
       cart = await cartModel.findById(newCartId);
-      console.log("cart created", cart);
     }
 
     const cartLogic = await cartModel.getItemLogic(cart.cartItems);
-    console.log("Running", cartLogic);
     cartLogic.addItem(toObjectId(productId), price, quantity);
 
     await cartModel.save(cart._id, {
@@ -45,7 +43,11 @@ export const addToCart = async (req, res) => {
       updatedAt: new Date(),
     });
 
-    res.json({ message: "Product added to cart", cartItems: cartLogic.items });
+    res.json({
+      message: "Product added to cart",
+      cartId: cart._id,
+      cartItems: cartLogic.items,
+    });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Error adding to cart" });
