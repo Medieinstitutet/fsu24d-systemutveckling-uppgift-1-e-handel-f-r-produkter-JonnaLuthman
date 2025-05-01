@@ -15,9 +15,9 @@ export const CustomerForm = () => {
     setCustomer({ ...customer, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = async () => {
+  // const handleSubmit = async () => {
 
-  }
+  // }
 
   return (
     <div className="container">
@@ -79,7 +79,7 @@ export const CustomerForm = () => {
             placeholder="City"
           />
         </div>
-        <button type="submit" onClick={(e) => handleSubmit(e)}>Continue checkout</button>
+        {/* <button type="submit" onClick={(e) => handleSubmit()}>Continue checkout</button> */}
       </form>
     </div>
   );
