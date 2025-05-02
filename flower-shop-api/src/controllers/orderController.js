@@ -2,6 +2,13 @@ import { Order } from "../models/Order.js";
 import { OrderItem } from "../models/OrderItem.js";
 import { Cart } from "../models/Cart.js";
 import { addTimestamps, updateTimestamp } from "../utils/timeStamps.js";
+import {
+  ApiError,
+  Client,
+  Environment,
+  LogLevel,
+  OrdersController,
+} from "@paypal/paypal-server-sdk";
 
 const orderModel = new Order();
 const orderItemModel = new OrderItem();
@@ -53,8 +60,6 @@ export const createOrder = async (req, res) => {
       return res.status(404).send({ error: "Cart not found or empty" });
     }
 
-
-
     const total_price = cart.cartItems.reduce(
       (sum, item) => sum + item.price * item.quantity,
       0
@@ -77,10 +82,10 @@ export const createOrder = async (req, res) => {
       price: item.price,
     }));
 
-    console.log(orderItemsData)
+    console.log(orderItemsData);
 
     const result = await orderItemModel.createItems(orderItemsData);
-    console.log(result)
+    console.log(result);
 
     // await cartModel.delete(cart_id);
 
@@ -129,5 +134,89 @@ export const deleteOrder = async (req, res) => {
   } catch (error) {
     console.error("Error creating order:", error);
     res.status(500).send({ error: "Internal Server Error" });
+  }
+};
+
+const { PAYPAL_CLIENT_ID, PAYPAL_CLIENT_SECRET } = process.env;
+
+const client = new Client({
+  clientCredentialsAuthCredentials: {
+    oAuthClientId: PAYPAL_CLIENT_ID,
+    oAuthClientSecret: PAYPAL_CLIENT_SECRET,
+  },
+  timeout: 0,
+  environment: Environment.Sandbox,
+  logging: {
+    logLevel: LogLevel.Info,
+    logRequest: { logBody: true },
+    logResponse: { logHeaders: true },
+  },
+});
+
+const ordersController = new OrdersController(client);
+
+export const createOrder_paypal = async (cart, amount) => {
+  const collect = {
+    body: {
+      intent: "CAPTURE",
+      purchaseUnits: [
+        {
+          amount: {
+            currencyCode: "SEK",
+            value: amount,
+            breakdown: {
+              itemTotal: {
+                currencyCode: "SEK",
+                value: amount,
+              },
+            },
+          },
+          items: cart.map((item) => ({
+            name: item.product_id,
+            quantity: item.quantity.toString(),
+            unitAmount: {
+              currencyCode: "SEK",
+              value: item.price.toFixed(2),
+            },
+          })),
+        },
+      ],
+    },
+    prefer: "return=minimal",
+  };
+
+  try {
+    const { body, ...httpResponse } = await ordersController.createOrder(
+      collect
+    );
+    return {
+      jsonResponse: JSON.parse(body),
+      httpStatusCode: httpResponse.statusCode,
+    };
+  } catch (error) {
+    if (error instanceof ApiError) {
+      throw new Error(error.message);
+    }
+  }
+};
+
+export const captureOrder_paypal = async (orderID) => {
+  const collect = {
+    id: orderID,
+    prefer: "return=minimal",
+  };
+
+  try {
+    const { body, ...httpResponse } = await ordersController.captureOrder(
+      collect
+    );
+    return {
+      jsonResponse: JSON.parse(body),
+      httpStatusCode: httpResponse.statusCode,
+    };
+  } catch (error) {
+    if (error instanceof ApiError) {
+      throw new Error(error.message);
+    }
   }
 };

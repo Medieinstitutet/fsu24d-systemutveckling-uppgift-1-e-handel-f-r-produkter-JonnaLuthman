@@ -6,12 +6,16 @@ import { getFromLocalStorage } from "../../utils/localStorage";
 import { removeCartItem } from "../../services/cartService";
 import { useOrders } from "../../hooks/useOrders";
 import { OrderCreate } from "../../types/Order";
+import { Paypal } from "../checkout/Paypal";
 
 export const CartComp = () => {
   const { handleFetchCart, handleUpdateCartItem } = useCart();
   const { createOrderHandler } = useOrders();
   const [cart, setCart] = useState<CartItem[] | null>(null);
   const [cartId, setCartId] = useState<string | null>(null);
+
+  const [checkout, setCheckout] = useState<boolean>(false);
+
   const navigate = useNavigate();
 
   const totalSum = 0;
@@ -100,6 +104,7 @@ export const CartComp = () => {
 
     console.log(payload);
     const data = await createOrderHandler(payload);
+    console.log("data from createorderHandler", data)
     setCart(null);
     navigate("/order-confirmation");
   };
@@ -171,14 +176,17 @@ export const CartComp = () => {
             </div>
 
             <div>
-              <button
-                type="button"
-                onClick={() => {
-                  handleCheckout();
-                }}
-              >
-                Checkout
-              </button>
+              {checkout ? (
+                <Paypal cart={cart} />
+              ) : (
+                <button
+                  onClick={() => {
+                    setCheckout(true);
+                  }}
+                >
+                  Checkout
+                </button>
+              )}
             </div>
           </div>
         </div>

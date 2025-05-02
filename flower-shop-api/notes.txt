@@ -2,3 +2,5 @@ user password: zob0SQdGczamZl1x
 username: jonnaluthman
 
 mongodb+srv://jonnaluthman:zob0SQdGczamZl1x@cluster0.h21qcz9.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0
+
+paypal_clientId: Acxb28CLdbTEUdXUmLmpH9hrlxy4w8FrMeMM8XPJ__j4E9r-dBW2RHCykuCxWHklzcpfZseMZSYdiBap
