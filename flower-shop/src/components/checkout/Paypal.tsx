@@ -10,7 +10,10 @@ declare global {
 import { CartItem } from "../../types/CartItem";
 import { useOrders } from "../../hooks/useOrders";
 import { OrderCreate } from "../../types/Order";
-import { getFromLocalStorage } from "../../utils/localStorage";
+import {
+  getFromLocalStorage,
+  removeFromLocalStorage,
+} from "../../utils/localStorage";
 import { useNavigate } from "react-router";
 
 interface ICartProps {
@@ -51,8 +54,6 @@ export const Paypal = ({ cart }: ICartProps) => {
           try {
             const response = await axios.post("/api/paypal/orders", payload);
             const orderData = response.data;
-
-            console.log("orderData in createOrder");
             if (orderData.id) {
               return orderData.id;
             }
@@ -68,7 +69,6 @@ export const Paypal = ({ cart }: ICartProps) => {
           }
         },
         async onApprove(data) {
-          console.log("data in onApprove", data);
           try {
             const response = await axios.post(
               `/api/paypal/${data.orderID}/capture`
@@ -90,8 +90,9 @@ export const Paypal = ({ cart }: ICartProps) => {
 
               if (transaction)
                 navigate("/order-confirmation", {
-                  state: { orderId: result._id },
+                  state: { orderId: result.orderId },
                 });
+              await removeFromLocalStorage("cartId");
             } catch (error) {
               console.log(error);
               throw new Error();

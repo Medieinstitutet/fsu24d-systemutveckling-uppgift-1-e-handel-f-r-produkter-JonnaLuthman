@@ -1,4 +1,4 @@
-import { CartComp } from "../../components/Cart/CartComp";
+import { CartComp } from "../../components/Checkout/CartComp";
 
 export const Checkout = () => {
   return (

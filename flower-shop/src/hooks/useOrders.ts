@@ -17,7 +17,7 @@ export const useOrders = () => {
       }
     };
   
-    const fetchOrderByIdHandler = async (id: number) => {
+    const fetchOrderByIdHandler = async (id: string) => {
       try {
         const data = await fetchOrderById(id);
         return data;
