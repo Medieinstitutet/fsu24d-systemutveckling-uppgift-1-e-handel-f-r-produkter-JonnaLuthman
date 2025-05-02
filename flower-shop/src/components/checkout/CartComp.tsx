@@ -6,7 +6,7 @@ import { getFromLocalStorage } from "../../utils/localStorage";
 import { removeCartItem } from "../../services/cartService";
 import { useOrders } from "../../hooks/useOrders";
 import { OrderCreate } from "../../types/Order";
-import { Paypal } from "../checkout/Paypal";
+import { Paypal } from "../Checkout/Paypal";
 
 export const CartComp = () => {
   const { handleFetchCart, handleUpdateCartItem } = useCart();
@@ -89,25 +89,7 @@ export const CartComp = () => {
   // ADD reset cart
   // const handleResetCart = async () => {}
 
-  const handleCheckout = async () => {
-    if (!cartId) {
-      console.error("Cart ID is null. Cannot proceed with checkout.");
-      return;
-    }
 
-    const payload: OrderCreate = {
-      cart_id: cartId,
-      customer_id: "6801016445bc00aaa481cd60", //Hårdkodat tills customer form är skapat
-      payment_status: "Not paid",
-      order_status: "Received",
-    };
-
-    console.log(payload);
-    const data = await createOrderHandler(payload);
-    console.log("data from createorderHandler", data)
-    setCart(null);
-    navigate("/order-confirmation");
-  };
 
   return (
     <div>

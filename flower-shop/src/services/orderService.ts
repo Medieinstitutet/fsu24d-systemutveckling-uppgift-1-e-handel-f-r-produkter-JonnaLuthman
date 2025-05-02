@@ -1,5 +1,5 @@
 import axios from "axios";
-import { Order, OrderCreate} from "../types/Order";
+import { Order, OrderCreate, OrderResponse} from "../types/Order";
 
 const ORDER_URL = "/api/orders";
 
@@ -23,17 +23,6 @@ export const fetchOrderById = async (id: string): Promise<Order> => {
   }
 };
 
-export const fetchOrderByPaymentId = async (id: string): Promise<Order> => {
-  try {
-    const response = await axios.get(`${ORDER_URL}/payment/${id}`);
-    console.log(response.data);
-    return response.data;
-  } catch (error) {
-    console.log(error);
-    throw new Error();
-  }
-}
-
 export const deleteOrder = async (id: string): Promise<void> => {
   try {
     await axios.delete(`${ORDER_URL}/${id}`);
@@ -56,7 +45,7 @@ export const updateOrder = async (
   }
 };
 
-export const createOrder = async (payload: OrderCreate) => {
+export const createOrder = async (payload: OrderCreate): Promise<OrderResponse> => {
   try {
     const response = await axios.post(`${ORDER_URL}/add`, payload);
     return response.data;

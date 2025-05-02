@@ -16,3 +16,9 @@ export type OrderCreate = {
   payment_status: string,
   order_status: string,
 };
+
+export type OrderResponse = {
+  orderId: string,
+  message: string,
+  result: {}
+}
