@@ -49,15 +49,12 @@ export const Paypal = ({ cart }: ICartProps) => {
           };
 
           try {
-            const response = await axios.post(
-              "/api/orders/paypal",
-              payload
-            );
+            const response = await axios.post("/api/paypal/orders", payload);
             const orderData = response.data;
 
-            console.log(orderData);
-            if (orderData.jsonResponse.id) {
-              return orderData.jsonResponse.id;
+            console.log("orderData in createOrder");
+            if (orderData.id) {
+              return orderData.id;
             }
 
             const errorDetail = orderData?.details?.[0];
@@ -71,9 +68,10 @@ export const Paypal = ({ cart }: ICartProps) => {
           }
         },
         async onApprove(data) {
+          console.log("data in onApprove", data);
           try {
             const response = await axios.post(
-              `/api/orders/${data.orderID}/capture`
+              `/api/paypal/${data.orderID}/capture`
             );
             const orderData = response.data;
 
@@ -84,19 +82,19 @@ export const Paypal = ({ cart }: ICartProps) => {
               order_status: "Created",
             };
 
-            const result = await createOrderHandler(payload);
-            console.log(result);
+            try {
+              const result = await createOrderHandler(payload);
+              console.log(result);
+              const transaction =
+                orderData?.purchase_units?.[0]?.payments?.captures?.[0];
 
-            const transaction =
-              orderData?.purchase_units?.[0]?.payments?.captures?.[0];
-
-            if (transaction) {
-              alert(`Tack! Betalning ${transaction.status}: ${transaction.id}`);
-              navigate("/order-confirmation", {
-                state: { orderId: result._id },
-              });
-            } else {
-              alert("Något gick fel.");
+              if (transaction)
+                navigate("/order-confirmation", {
+                  state: { orderId: result._id },
+                });
+            } catch (error) {
+              console.log(error);
+              throw new Error();
             }
           } catch (error) {
             console.error("Error capturing PayPal order:", error);

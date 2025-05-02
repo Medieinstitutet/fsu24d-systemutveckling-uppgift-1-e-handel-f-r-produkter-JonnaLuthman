@@ -139,8 +139,6 @@ export const deleteOrder = async (req, res) => {
 
 const { PAYPAL_CLIENT_ID, PAYPAL_CLIENT_SECRET } = process.env;
 
-console.log(PAYPAL_CLIENT_ID, PAYPAL_CLIENT_SECRET);
-
 const client = new Client({
   clientCredentialsAuthCredentials: {
     oAuthClientId: PAYPAL_CLIENT_ID,
@@ -157,9 +155,7 @@ const client = new Client({
 
 const ordersController = new OrdersController(client);
 
-export const createOrder_paypal = async (req, res) => {
-  console.log(req.body);
-
+export const createOrder_paypal = async (cart, amount) => {
   const collect = {
     body: {
       intent: "CAPTURE",
@@ -167,16 +163,15 @@ export const createOrder_paypal = async (req, res) => {
         {
           amount: {
             currencyCode: "SEK",
-            value: req.body.amount,
+            value: amount,
             breakdown: {
               itemTotal: {
                 currencyCode: "SEK",
-                value: req.body.amount,
+                value: amount,
               },
             },
           },
-          // lookup item details in `cart` from database
-          items: req.body.cart.map((item) => ({
+          items: cart.map((item) => ({
             name: item.product_id,
             quantity: item.quantity.toString(),
             unitAmount: {
@@ -191,48 +186,37 @@ export const createOrder_paypal = async (req, res) => {
   };
 
   try {
-    console.log("collect", collect.body.purchaseUnits);
     const { body, ...httpResponse } = await ordersController.createOrder(
       collect
     );
-    // Get more response info...
-    // const { statusCode, headers } = httpResponse;
-    res.send({
-      jsonResponse: JSON.parse(body),
-      httpStatusCode: httpResponse.statusCode,
-    });
-  } catch (error) {
-    if (error instanceof ApiError) {
-      throw new Error(error.message);
-    }
-
-  }
-};
-
-export const captureOrder_paypal = async (orderID) => {
-
-  console.log("captureOrder_paypal running")
-
-  const collect = {
-    id: orderID,
-    prefer: "return=minimal",
-  };
-
-  try {
-    const { body, ...httpResponse } =
-      await ordersController.captureOrder(collect);
-    console.log("captureOrder_paypal running");
-    // Get more response info...
-    // const { statusCode, headers } = httpResponse;
     return {
       jsonResponse: JSON.parse(body),
       httpStatusCode: httpResponse.statusCode,
     };
   } catch (error) {
     if (error instanceof ApiError) {
-      // const { statusCode, headers } = error;
       throw new Error(error.message);
     }
-    console.log("End catch", error);
+  }
+};
+
+export const captureOrder_paypal = async (orderID) => {
+  const collect = {
+    id: orderID,
+    prefer: "return=minimal",
+  };
+
+  try {
+    const { body, ...httpResponse } = await ordersController.captureOrder(
+      collect
+    );
+    return {
+      jsonResponse: JSON.parse(body),
+      httpStatusCode: httpResponse.statusCode,
+    };
+  } catch (error) {
+    if (error instanceof ApiError) {
+      throw new Error(error.message);
+    }
   }
 };
