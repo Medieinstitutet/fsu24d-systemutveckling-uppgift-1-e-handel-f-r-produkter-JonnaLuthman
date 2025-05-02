@@ -13,7 +13,7 @@ export const fetchOrders = async (): Promise<Order[]> => {
   }
 };
 
-export const fetchOrderById = async (id: number): Promise<Order> => {
+export const fetchOrderById = async (id: string): Promise<Order> => {
   try {
     const response = await axios.get(`${ORDER_URL}/${id}`);
     return response.data;
@@ -34,7 +34,7 @@ export const fetchOrderByPaymentId = async (id: string): Promise<Order> => {
   }
 }
 
-export const deleteOrder = async (id: number): Promise<void> => {
+export const deleteOrder = async (id: string): Promise<void> => {
   try {
     await axios.delete(`${ORDER_URL}/${id}`);
   } catch (error) {
@@ -44,7 +44,7 @@ export const deleteOrder = async (id: number): Promise<void> => {
 };
 
 export const updateOrder = async (
-  id: number,
+  id: string,
   payload: Order
 ): Promise<Order> => {
   try {

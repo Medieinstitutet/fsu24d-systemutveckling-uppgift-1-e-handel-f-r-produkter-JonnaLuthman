@@ -2,6 +2,13 @@ import { Order } from "../models/Order.js";
 import { OrderItem } from "../models/OrderItem.js";
 import { Cart } from "../models/Cart.js";
 import { addTimestamps, updateTimestamp } from "../utils/timeStamps.js";
+import {
+  ApiError,
+  Client,
+  Environment,
+  LogLevel,
+  OrdersController,
+} from "@paypal/paypal-server-sdk";
 
 const orderModel = new Order();
 const orderItemModel = new OrderItem();
@@ -53,8 +60,6 @@ export const createOrder = async (req, res) => {
       return res.status(404).send({ error: "Cart not found or empty" });
     }
 
-
-
     const total_price = cart.cartItems.reduce(
       (sum, item) => sum + item.price * item.quantity,
       0
@@ -77,10 +82,10 @@ export const createOrder = async (req, res) => {
       price: item.price,
     }));
 
-    console.log(orderItemsData)
+    console.log(orderItemsData);
 
     const result = await orderItemModel.createItems(orderItemsData);
-    console.log(result)
+    console.log(result);
 
     // await cartModel.delete(cart_id);
 
@@ -129,5 +134,105 @@ export const deleteOrder = async (req, res) => {
   } catch (error) {
     console.error("Error creating order:", error);
     res.status(500).send({ error: "Internal Server Error" });
+  }
+};
+
+const { PAYPAL_CLIENT_ID, PAYPAL_CLIENT_SECRET } = process.env;
+
+console.log(PAYPAL_CLIENT_ID, PAYPAL_CLIENT_SECRET);
+
+const client = new Client({
+  clientCredentialsAuthCredentials: {
+    oAuthClientId: PAYPAL_CLIENT_ID,
+    oAuthClientSecret: PAYPAL_CLIENT_SECRET,
+  },
+  timeout: 0,
+  environment: Environment.Sandbox,
+  logging: {
+    logLevel: LogLevel.Info,
+    logRequest: { logBody: true },
+    logResponse: { logHeaders: true },
+  },
+});
+
+const ordersController = new OrdersController(client);
+
+export const createOrder_paypal = async (req, res) => {
+  console.log(req.body);
+
+  const collect = {
+    body: {
+      intent: "CAPTURE",
+      purchaseUnits: [
+        {
+          amount: {
+            currencyCode: "SEK",
+            value: req.body.amount,
+            breakdown: {
+              itemTotal: {
+                currencyCode: "SEK",
+                value: req.body.amount,
+              },
+            },
+          },
+          // lookup item details in `cart` from database
+          items: req.body.cart.map((item) => ({
+            name: item.product_id,
+            quantity: item.quantity.toString(),
+            unitAmount: {
+              currencyCode: "SEK",
+              value: item.price.toFixed(2),
+            },
+          })),
+        },
+      ],
+    },
+    prefer: "return=minimal",
+  };
+
+  try {
+    console.log("collect", collect.body.purchaseUnits);
+    const { body, ...httpResponse } = await ordersController.createOrder(
+      collect
+    );
+    // Get more response info...
+    // const { statusCode, headers } = httpResponse;
+    res.send({
+      jsonResponse: JSON.parse(body),
+      httpStatusCode: httpResponse.statusCode,
+    });
+  } catch (error) {
+    if (error instanceof ApiError) {
+      throw new Error(error.message);
+    }
+
+  }
+};
+
+export const captureOrder_paypal = async (orderID) => {
+
+  console.log("captureOrder_paypal running")
+
+  const collect = {
+    id: orderID,
+    prefer: "return=minimal",
+  };
+
+  try {
+    const { body, ...httpResponse } =
+      await ordersController.captureOrder(collect);
+    console.log("captureOrder_paypal running");
+    // Get more response info...
+    // const { statusCode, headers } = httpResponse;
+    return {
+      jsonResponse: JSON.parse(body),
+      httpStatusCode: httpResponse.statusCode,
+    };
+  } catch (error) {
+    if (error instanceof ApiError) {
+      // const { statusCode, headers } = error;
+      throw new Error(error.message);
+    }
+    console.log("End catch", error);
   }
 };
