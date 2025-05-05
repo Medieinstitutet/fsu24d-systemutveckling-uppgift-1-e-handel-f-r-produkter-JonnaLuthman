@@ -15,6 +15,7 @@ import {
   removeFromLocalStorage,
 } from "../../utils/localStorage";
 import { useNavigate } from "react-router";
+import { calculateCartTotal } from "../../utils/calculateCartTotal";
 
 interface ICartProps {
   cart: CartItem[] | null;
@@ -37,11 +38,12 @@ export const Paypal = ({ cart }: ICartProps) => {
           label: "checkout",
         },
         async createOrder() {
-          const totalAmount = cart.reduce(
-            (sum, item) => sum + item.price * item.quantity,
-            0
-          );
-
+          // const totalAmount = cart.reduce(
+          //   (sum, item) => sum + item.price * item.quantity,
+          //   0
+          // );
+          const totalAmount = calculateCartTotal(cart);
+          
           const payload = {
             cart: cart.map((item) => ({
               product_id: item.productId,
