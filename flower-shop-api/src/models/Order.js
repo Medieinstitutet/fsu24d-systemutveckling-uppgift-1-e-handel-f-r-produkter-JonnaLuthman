@@ -25,11 +25,6 @@ export class Order extends BaseModel {
         },
       },
       {
-        $addFields: {
-          customer_id: { $toObjectId: "$customer_id" },
-        },
-      },
-      {
         $lookup: {
           from: "customers",
           localField: "customer_id",
