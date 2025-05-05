@@ -6,7 +6,7 @@ import {
   deleteProduct,
   createProduct,
 } from "../services/productService";
-import { Product } from "../types/Product";
+import { Product, ProductCreate } from "../types/Product";
 
 export const useProducts = () => {
   const [error, setError] = useState<string>("");
@@ -22,7 +22,7 @@ export const useProducts = () => {
     }
   };
 
-  const fetchProductByIdHandler = async (id: number) => {
+  const fetchProductByIdHandler = async (id: string) => {
     try {
       const data = await fetchProductById(id);
       return data;
@@ -33,7 +33,7 @@ export const useProducts = () => {
     }
   };
 
-  const deleteProductHandler = async (id: number) => {
+  const deleteProductHandler = async (id: string) => {
     try {
       await deleteProduct(id);
     } catch (error) {
@@ -43,7 +43,7 @@ export const useProducts = () => {
     }
   };
 
-  const updateProductHandler = async (id: number, payload: Product) => {
+  const updateProductHandler = async (id: string, payload: Product) => {
     try {
       const data = await updateProduct(id, payload);
       return data;
@@ -54,7 +54,7 @@ export const useProducts = () => {
     }
   };
 
-  const createProductHandler = async (payload: Product) => {
+  const createProductHandler = async (payload: ProductCreate) => {
     try {
       const data = await createProduct(payload);
       return data;

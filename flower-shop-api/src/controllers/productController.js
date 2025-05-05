@@ -35,6 +35,7 @@ export const getProductById = async (req, res) => {
 
 export const createProduct = async (req, res) => {
   const { title, stock, description, price } = req.body;
+  console.log("createProduct is running")
 
   if (!title || !stock || !description || !price) {
     return res.status(400).send({ error: "All fields are required" });
@@ -47,8 +48,11 @@ export const createProduct = async (req, res) => {
     price,
   };
 
+  console.log("createProduct is running", newProduct)
+
   try {
-    const result = await productsModel.create(newProduct);
+    const result = await productsModel.save(null, newProduct);
+    console.log("createProduct is running", result)
     res.send({ message: "Product created", id: result.insertedId });
   } catch (error) {
     console.error("Error creating product:", error);
@@ -74,10 +78,11 @@ export const deleteProduct = async (req, res) => {
 
 export const updateProduct = async (req, res) => {
   const productId = req.params.id;
-  const { stock } = req.body;
+  const { price, description, stock, title} = req.body;
+
 
   try {
-    const result = await productsModel.update(productId, stock);
+    const result = await productsModel.save(productId,{ price, description, stock, title});
     const product = await productsModel.findById(productId);
 
     if (typeof stock !== "number" || stock < 0) {
@@ -90,7 +95,7 @@ export const updateProduct = async (req, res) => {
       return res.status(404).send({ error: "Product not found" });
     }
 
-    res.send({ "Stock updated": product });
+    res.send({ "Product updated": product });
   } catch (error) {
     console.error("Error creating product:", error);
     res.status(500).send({ error: "Internal Server Error" });
