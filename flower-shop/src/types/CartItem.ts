@@ -1,7 +1,15 @@
+import { Product } from "./Product";
+
 export type CartItem = {
   _id: string;
   order_id: string;
   productId: string;
+  quantity: number;
+  price: number;
+};
+
+export type CartItemWithDetails = {
+  product: Product;
   quantity: number;
   price: number;
 };
