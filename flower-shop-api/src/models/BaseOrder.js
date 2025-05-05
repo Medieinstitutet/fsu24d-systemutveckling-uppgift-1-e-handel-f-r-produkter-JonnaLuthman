@@ -1,12 +1,19 @@
 export class BaseOrder {
   constructor(items = []) {
-    this.items = items;
+    this.items = items.filter(
+      (item) =>
+        item &&
+        item.productId &&
+        typeof item.price === "number" &&
+        typeof item.quantity === "number"
+    );
   }
 
   addItem(productId, price, quantity = 1) {
     const existingItem = this.items.find((item) =>
       item.productId.equals(productId)
     );
+
     if (existingItem) {
       existingItem.quantity += quantity;
     } else {

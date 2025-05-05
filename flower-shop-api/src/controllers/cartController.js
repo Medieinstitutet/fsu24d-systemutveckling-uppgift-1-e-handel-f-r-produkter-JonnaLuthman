@@ -1,11 +1,13 @@
 import { toObjectId } from "../utils/toObjectId.js";
+import { ObjectId } from "mongodb";
 import { Cart } from "../models/Cart.js";
 
 const cartModel = new Cart();
 
 export async function getCart(req, res) {
   try {
-    const cart = await cartModel.findById(req.params.cartId);
+    const cart = await cartModel.getCartWithDetails(req.params.cartId);
+
     if (!cart) return res.status(404).json({ message: "Cart not found" });
     res.json(cart);
   } catch (err) {
@@ -27,16 +29,23 @@ export const addToCart = async (req, res) => {
     let cart;
 
     if (cartId) {
-      cart = await cartModel.findById(cartId);
+      cart = await cartModel.getCartWithDetails(cartId);
     }
 
     if (!cart) {
       const newCartId = await cartModel.createEmptyCart();
-      cart = await cartModel.findById(newCartId);
+      cart = await cartModel.getCartWithDetails(newCartId);
     }
 
     const cartLogic = await cartModel.getItemLogic(cart.cartItems);
-    cartLogic.addItem(toObjectId(productId), price, quantity);
+
+    const objectId = toObjectId(productId);
+
+    if (!ObjectId.isValid(productId)) {
+      return res.status(400).json({ error: "Invalid productId format" });
+    }
+
+    cartLogic.addItem(objectId, price, quantity);
 
     await cartModel.save(cart._id, {
       cartItems: cartLogic.items,
@@ -65,7 +74,7 @@ export async function updateCartItem(req, res) {
   }
 
   try {
-    const cart = await cartModel.findById(cartId);
+    const cart = await cartModel.getCartWithDetails(cartId);
     if (!cart) return res.status(404).json({ message: "Cart not found" });
 
     const logic = cartModel.getItemLogic(cart.cartItems);
@@ -88,7 +97,7 @@ export async function removeFromCart(req, res) {
   const { productId } = req.body;
 
   try {
-    const cart = await cartModel.findById(cartId);
+    const cart = await cartModel.getCartWithDetails(cartId);
     if (!cart) return res.status(404).json({ message: "Cart not found" });
 
     const logic = cartModel.getItemLogic(cart.cartItems);
