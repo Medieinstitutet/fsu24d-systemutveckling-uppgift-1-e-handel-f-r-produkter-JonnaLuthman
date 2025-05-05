@@ -54,11 +54,11 @@ export const createCustomer = async (req, res) => {
     email,
     street_address,
     zip_code,
-    city
+    city,
   };
 
   try {
-    const result = await customerModel.create(newCustomer);
+    const result = await customerModel.save(null, newCustomer);
     res.send({ message: "Customer created", id: result.insertedId });
   } catch (error) {
     console.error("Error creating customer:", error);

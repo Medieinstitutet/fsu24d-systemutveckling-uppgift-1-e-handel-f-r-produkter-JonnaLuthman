@@ -19,9 +19,10 @@ import { calculateCartTotal } from "../../utils/calculateCartTotal";
 
 interface ICartProps {
   cart: CartItem[] | null;
+  customerId: string;
 }
 
-export const Paypal = ({ cart }: ICartProps) => {
+export const PaypalCheckoutButton = ({ cart, customerId }: ICartProps) => {
   const paypal = useRef(null);
   const { createOrderHandler } = useOrders();
   const navigate = useNavigate();
@@ -38,10 +39,6 @@ export const Paypal = ({ cart }: ICartProps) => {
           label: "checkout",
         },
         async createOrder() {
-          // const totalAmount = cart.reduce(
-          //   (sum, item) => sum + item.price * item.quantity,
-          //   0
-          // );
           const totalAmount = calculateCartTotal(cart);
           
           const payload = {
@@ -75,18 +72,18 @@ export const Paypal = ({ cart }: ICartProps) => {
             const response = await axios.post(
               `/api/paypal/${data.orderID}/capture`
             );
-            const orderData = response.data;
 
+            const orderData = response.data;
             const payload: OrderCreate = {
               cart_id: await getFromLocalStorage("cartId"),
-              customer_id: "Jonna",
+              customer_id: customerId,
               payment_status: "Paid",
               order_status: "Created",
             };
 
             try {
               const result = await createOrderHandler(payload);
-              console.log(result);
+              console.log("result", result);
               const transaction =
                 orderData?.purchase_units?.[0]?.payments?.captures?.[0];
 
@@ -112,6 +109,24 @@ export const Paypal = ({ cart }: ICartProps) => {
 
   return (
     <div>
+
+<h2>This is your order</h2>
+
+<ul>
+  {cart?.map((item) => (
+    <li key={item._id}>
+      <p><strong>{item.productId}</strong></p>
+      <p>Quantity: {item.quantity}</p>
+      <p>Price per item: {item.price} kr</p>
+      <p>Subtotal: {item.price * item.quantity} kr</p>
+      <hr />
+    </li>
+  ))}
+
+  <li>
+    <p><strong>Total:</strong> {cart?.reduce((total, item) => total + item.price * item.quantity, 0)} kr</p>
+  </li>
+</ul>
       <div ref={paypal}></div>
     </div>
   );

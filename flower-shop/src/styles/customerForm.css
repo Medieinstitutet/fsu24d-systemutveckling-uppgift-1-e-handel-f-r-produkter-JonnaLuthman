@@ -1,0 +1,33 @@
+.customer-form {
+    max-width: 500px;
+    margin: 2rem auto;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .customer-form label {
+    display: flex;
+    flex-direction: column;
+    font-weight: 500;
+  }
+  
+  .customer-form input {
+    padding: 0.5rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+  }
+  
+  .customer-form button {
+    padding: 0.75rem;
+    background-color: #0070f3;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  
+  .customer-form button:hover {
+    background-color: #005ec2;
+  }
+  

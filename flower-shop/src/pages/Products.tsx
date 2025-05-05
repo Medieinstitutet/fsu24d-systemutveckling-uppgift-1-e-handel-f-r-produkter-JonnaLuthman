@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
-import { useProducts } from "../hooks/useProducts";
-import { Product } from "../types/Product";
+import { useProducts } from "../hooks/useProducts.ts";
+import { Product } from "../types/Product.ts";
 import { addToCart } from "../services/cartService";
-import { CartItemCreate } from "../types/CartItem";
-import { useCart } from "../hooks/useCart";
+import { CartItemCreate } from "../types/CartItem.ts";
+import { useCart } from "../hooks/useCart.ts";
 
 export const Products = () => {
   const [products, setProducts] = useState<Product[]>([]);
@@ -51,7 +51,7 @@ export const Products = () => {
         <ul>
           {products.map((product) => (
             <li key={product._id}>
-              <strong>{product.title}</strong> – ${product.price} <br />
+              <strong>{product.title}</strong> – {product.price} sek <br />
               Stock: {product.stock} <br />
               {product.description}
               <button

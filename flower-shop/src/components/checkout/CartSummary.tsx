@@ -1,17 +1,20 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router";
-import { useCart } from "../../hooks/useCart.js";
-import { CartItem } from "../../types/CartItem.js";
-import { getFromLocalStorage } from "../../utils/localStorage.js";
+import { useCart } from "../../hooks/useCart.ts";
+import { CartItemWithDetails } from "../../types/CartItem.ts";
+import { getFromLocalStorage } from "../../utils/localStorage.ts";
 import { removeCartItem } from "../../services/cartService.js";
-import { Paypal } from "./Paypal.js";
-import { calculateCartTotal } from "../../utils/calculateCartTotal.js";
+import { calculateCartTotal } from "../../utils/calculateCartTotal.ts";
+import { Cart } from "../../types/Cart.ts";
 
-export const CartComp = () => {
+interface Props {
+  onCartReady: (items: Cart) => void;
+}
+
+export const CartSummary = ({onCartReady} : Props) => {
   const { handleFetchCart, handleUpdateCartItem } = useCart();
-  const [cart, setCart] = useState<CartItem[] | null>(null);
+  const [cart, setCart] = useState<CartItemWithDetails[] | null>(null);
   const [cartId, setCartId] = useState<string | null>(null);
-  const [checkout, setCheckout] = useState<boolean>(false);
   const [totalSum, setTotalSum] = useState<number>(0);
 
   useEffect(() => {
@@ -22,15 +25,19 @@ export const CartComp = () => {
   useEffect(() => {
     if (!cartId) return;
     const getCart = async () => {
-      const data = await handleFetchCart(cartId);
-      setCart(data.cartItems);
+      const data: Cart = await handleFetchCart(cartId);
+      const cartItems = data.cartItems
+      console.log("cartItems",cartItems)
+      setCart(cartItems);
+
     };
     getCart();
   }, [cartId]);
 
   useEffect(() => {
     if (cart) {
-      setTotalSum(calculateCartTotal(cart))
+      onCartReady(cart)
+      setTotalSum(calculateCartTotal(cart));
     }
   }, [cart]);
 
@@ -48,7 +55,7 @@ export const CartComp = () => {
     setCart(
       (prev) =>
         prev?.map((item) =>
-          item.productId === productId
+          item.product._id === productId
             ? { ...item, quantity: item.quantity + 1 }
             : item
         ) || null
@@ -73,7 +80,7 @@ export const CartComp = () => {
     setCart(
       (prev) =>
         prev?.map((item) =>
-          item.productId === productId
+          item.product._id === productId
             ? { ...item, quantity: item.quantity - 1 }
             : item
         ) || null
@@ -83,10 +90,11 @@ export const CartComp = () => {
   const handleRemoveFromCart = async (productId: string) => {
     if (!cartId) return;
     const data = await removeCartItem(cartId, productId);
+    console.log("handleRemoveData",data)
     setCart(data.cartItems);
   };
 
-  // ADD reset cart
+  // TODO - ADD reset cart
   // const handleResetCart = async () => {}
 
   return (
@@ -102,12 +110,12 @@ export const CartComp = () => {
         <div>
           <h2>Shopping Cart</h2>
           <div>
-            {cart?.map((cartItem: CartItem) => (
-              <ul key={cartItem._id}>
+            {cart?.map((cartItem: CartItemWithDetails) => (
+              <ul key={cartItem.product._id}>
                 <li>
                   <div>
                     <div>
-                      <p>{cartItem.productId}</p>
+                      <p>{cartItem.product.title}</p>
                     </div>
 
                     <div>
@@ -115,7 +123,7 @@ export const CartComp = () => {
                       <button
                         onClick={() =>
                           decreaseProductQuantity(
-                            cartItem.productId,
+                            cartItem.product._id,
                             cartItem.quantity
                           )
                         }
@@ -126,7 +134,7 @@ export const CartComp = () => {
                       <button
                         onClick={() =>
                           increaseProductQuantity(
-                            cartItem.productId,
+                            cartItem.product._id,
                             cartItem.quantity
                           )
                         }
@@ -138,7 +146,7 @@ export const CartComp = () => {
 
                   <div>
                     <button
-                      onClick={() => handleRemoveFromCart(cartItem.productId)}
+                      onClick={() => handleRemoveFromCart(cartItem.product._id)}
                       type="button"
                     >
                       Remove from cart
@@ -151,23 +159,10 @@ export const CartComp = () => {
             <div>
               <p>Total</p>
               <p>
-                <span>sek</span> {totalSum}
+                <span> {totalSum} sek</span>
               </p>
             </div>
 
-            <div>
-              {checkout ? (
-                <Paypal cart={cart} />
-              ) : (
-                <button
-                  onClick={() => {
-                    setCheckout(true);
-                  }}
-                >
-                  Checkout
-                </button>
-              )}
-            </div>
           </div>
         </div>
       )}
