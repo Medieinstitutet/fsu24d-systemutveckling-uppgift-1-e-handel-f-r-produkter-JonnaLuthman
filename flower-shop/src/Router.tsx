@@ -8,7 +8,7 @@ import { OrderConfirmation } from "./pages/Checkout/OrderConfirmation";
 import { Products } from "./pages/Products";
 import { AdminOrders } from "./pages/Admin/AdminOrders";
 import { ContactUs } from "./pages/ContactUs";
-import EditProduct from "./components/Admin/EditProduct";
+import AdminProducts from "./pages/Admin/AdminProducts";
 
 export const router = createBrowserRouter([
   {
@@ -34,7 +34,7 @@ export const router = createBrowserRouter([
       },
       {
         path: "/admin/products",
-        element: <EditProduct />,
+        element: <AdminProducts />,
       },
       {
         path: "/checkout",

@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { useProducts } from "../hooks/useProducts.ts";
 import { Product } from "../types/Product.ts";
-import { addToCart } from "../services/cartService";
 import { CartItemCreate } from "../types/CartItem.ts";
 import { useCart } from "../hooks/useCart.ts";
 
@@ -21,10 +20,11 @@ export const Products = () => {
         console.error(error);
       }
     };
-
+    
     loadProducts();
-  }, []);
-
+  }, [products]);
+  
+  console.log(products)
   if (error) {
     return <p>{error}</p>;
   }
