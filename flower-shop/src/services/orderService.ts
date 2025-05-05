@@ -1,9 +1,14 @@
 import axios from "axios";
-import { Order, OrderCreate, OrderResponse} from "../types/Order";
+import {
+  Order,
+  OrderCreate,
+  OrderResponse,
+  OrderWithDetails,
+} from "../types/Order";
 
 const ORDER_URL = "/api/orders";
 
-export const fetchOrders = async (): Promise<Order[]> => {
+export const fetchOrders = async (): Promise<OrderWithDetails[]> => {
   try {
     const response = await axios.get(`${ORDER_URL}`);
     return response.data;
@@ -13,7 +18,7 @@ export const fetchOrders = async (): Promise<Order[]> => {
   }
 };
 
-export const fetchOrderById = async (id: string): Promise<Order> => {
+export const fetchOrderById = async (id: string): Promise<OrderWithDetails> => {
   try {
     const response = await axios.get(`${ORDER_URL}/${id}`);
     return response.data;
@@ -45,7 +50,9 @@ export const updateOrder = async (
   }
 };
 
-export const createOrder = async (payload: OrderCreate): Promise<OrderResponse> => {
+export const createOrder = async (
+  payload: OrderCreate
+): Promise<OrderResponse> => {
   try {
     const response = await axios.post(`${ORDER_URL}/add`, payload);
     return response.data;
@@ -54,4 +61,3 @@ export const createOrder = async (payload: OrderCreate): Promise<OrderResponse> 
     throw new Error();
   }
 };
-

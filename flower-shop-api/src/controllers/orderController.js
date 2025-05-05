@@ -17,7 +17,6 @@ const cartModel = new Cart();
 export const getAllOrders = async (req, res) => {
   try {
     const orders = await orderModel.findAllWithDetails();
-    console.log(orders);
     if (!orders) {
       return res.status(404).send({ error: "Could not fetch orders" });
     }
@@ -32,7 +31,7 @@ export const getOrderById = async (req, res) => {
   const id = req.params.id;
   try {
     const order = await orderModel.findByIdWithDetails(id);
-
+    console.log("order in fetchOrderbyID", order)
     if (!order) {
       return res.status(404).send({ error: "Order not found" });
     }

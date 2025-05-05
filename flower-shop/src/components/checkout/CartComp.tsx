@@ -1,24 +1,18 @@
 import { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router";
-import { useCart } from "../../hooks/useCart";
-import { CartItem } from "../../types/CartItem";
-import { getFromLocalStorage } from "../../utils/localStorage";
-import { removeCartItem } from "../../services/cartService";
-import { useOrders } from "../../hooks/useOrders";
-import { OrderCreate } from "../../types/Order";
-import { Paypal } from "../Checkout/Paypal";
+import { Link } from "react-router";
+import { useCart } from "../../hooks/useCart.js";
+import { CartItem } from "../../types/CartItem.js";
+import { getFromLocalStorage } from "../../utils/localStorage.js";
+import { removeCartItem } from "../../services/cartService.js";
+import { Paypal } from "./Paypal.js";
+import { calculateCartTotal } from "../../utils/calculateCartTotal.js";
 
 export const CartComp = () => {
   const { handleFetchCart, handleUpdateCartItem } = useCart();
-  const { createOrderHandler } = useOrders();
   const [cart, setCart] = useState<CartItem[] | null>(null);
   const [cartId, setCartId] = useState<string | null>(null);
-
   const [checkout, setCheckout] = useState<boolean>(false);
-
-  const navigate = useNavigate();
-
-  const totalSum = 0;
+  const [totalSum, setTotalSum] = useState<number>(0);
 
   useEffect(() => {
     const id = getFromLocalStorage("cartId");
@@ -33,6 +27,12 @@ export const CartComp = () => {
     };
     getCart();
   }, [cartId]);
+
+  useEffect(() => {
+    if (cart) {
+      setTotalSum(calculateCartTotal(cart))
+    }
+  }, [cart]);
 
   const increaseProductQuantity = async (
     productId: string,
@@ -88,8 +88,6 @@ export const CartComp = () => {
 
   // ADD reset cart
   // const handleResetCart = async () => {}
-
-
 
   return (
     <div>

@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
-import { Order } from "../../types/Order";
+import { OrderWithDetails } from "../../types/Order";
 import { useOrders } from "../../hooks/useOrders";
 
 export const AdminOrders = () => {
-  const [orders, setOrders] = useState<Order[]>([]);
+  const [orders, setOrders] = useState<OrderWithDetails[]>([]);
   const [error, setError] = useState<string>("");
   const { fetchOrdersHandler } = useOrders();
 
@@ -11,6 +11,7 @@ export const AdminOrders = () => {
     const loadOrders = async () => {
       try {
         const data = await fetchOrdersHandler();
+        console.log(data)
         setOrders(data);
       } catch (error) {
         setError("Failed to load orders");
@@ -34,10 +35,10 @@ export const AdminOrders = () => {
         <ul>
           {orders.map((order) => (
             <div key={order._id}>
-              <li> Customer: {order.customer_id} - 
+              <li> Customer: {order.customer.first_name} - 
               Total price: {order.total_price}</li>
               {order.order_items.map((item) => (
-                <p key={item._id}>Order items: {item.product_id}</p>
+                <p key={item.product._id}>Order items: {item.product.description}</p>
               ))}
             </div>
           ))}
