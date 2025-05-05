@@ -9,5 +9,3 @@ export type Customer = {
 }
 
 export type CustomerCreate = Omit<Customer, "_id" | "created_at">
-
-export type CustomerPublic = Omit<CustomerCreate, "password">;
