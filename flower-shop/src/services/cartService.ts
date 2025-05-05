@@ -32,7 +32,6 @@ export const fetchCart = async (cartId: string): Promise<Cart> => {
 export const updateCartItem = async (cartId: string, payload: CartItemUpdate): Promise<CartUpdate> => {
     try {
         const response = await axios.patch(`${CART_URL}/${cartId}/update`, payload);
-        console.log("updateCartItem response.data",response.data)
         return response.data;
       } catch (error) {
         console.log(error);
@@ -43,7 +42,6 @@ export const updateCartItem = async (cartId: string, payload: CartItemUpdate): P
 export const removeCartItem = async (cartId: string, productId: string): Promise<CartUpdate> => {
     try {
         const response = await axios.delete(`${CART_URL}/${cartId}/remove`, { data: { productId } });
-        console.log("removeCartItem, cart item deleted", response.data)
         return response.data;
       } catch (error) {
         console.log(error);

@@ -42,10 +42,6 @@ export const router = createBrowserRouter([
         element: <Checkout />,
       },
       {
-        path: "/checkout/payment",
-        element: <CheckoutPayment />,
-      },
-      {
         path: "/contact-us",
         element: <ContactUs />,
       },

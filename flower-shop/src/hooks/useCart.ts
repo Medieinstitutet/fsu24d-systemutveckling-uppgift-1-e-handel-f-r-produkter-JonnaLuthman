@@ -3,8 +3,8 @@ import {
   saveToLocalStorage,
 } from "./../utils/localStorage";
 import { useState } from "react";
-import { addToCart, fetchCart, updateCartItem } from "../services/cartService";
-import { CartItemCreate, CartItemUpdate } from "../types/CartItem";
+import { addToCart, fetchCart, updateCartItem } from "../services/cartService.ts";
+import { CartItemCreate, CartItemUpdate } from "../types/CartItem.ts";
 
 export const useCart = () => {
   const [cartId, setCartId] = useState<string | null>(() => {
