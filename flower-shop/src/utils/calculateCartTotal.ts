@@ -1,6 +1,6 @@
-import { CartItem } from "../types/CartItem";
+import { CartItemWithDetails } from "../types/CartItem";
 
-export const calculateCartTotal = (cart: CartItem[]) => {
+export const calculateCartTotal = (cart: CartItemWithDetails[]) => {
   const cartTotal = cart.reduce(
     (sum, item) => sum + item.price * item.quantity,
     0

@@ -1,8 +1,8 @@
-import { CartItem, CartItemWithDetails } from "./CartItem";
+import {  CartItemWithDetails } from "./CartItem";
 
 export type Cart = {
   _id: string;
-  cartItems: CartItem[];
+  cartItems: CartItemWithDetails[];
   updatedAt?: string;
   createdAt: string;
 };

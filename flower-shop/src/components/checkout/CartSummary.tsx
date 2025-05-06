@@ -6,10 +6,10 @@ import { getFromLocalStorage } from "../../utils/localStorage.ts";
 import { removeCartItem } from "../../services/cartService.js";
 import { calculateCartTotal } from "../../utils/calculateCartTotal.ts";
 import { Cart } from "../../types/Cart.ts";
-import "../../styles/cartSummary.css"
+import "../../styles/cartSummary.css";
 
 interface Props {
-  onCartReady: (items: Cart) => void;
+  onCartReady: (items: CartItemWithDetails[]) => void;
 }
 
 export const CartSummary = ({ onCartReady }: Props) => {
@@ -27,7 +27,7 @@ export const CartSummary = ({ onCartReady }: Props) => {
     if (!cartId) return;
     const getCart = async () => {
       const data: Cart = await handleFetchCart(cartId);
-      const cartItems = data.cartItems;
+      const cartItems: CartItemWithDetails[] = data.cartItems;
       console.log("cartItems", cartItems);
       setCart(cartItems);
     };

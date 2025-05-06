@@ -19,10 +19,11 @@ export const OrderConfirmation = () => {
         console.log("Could not fetch order in Order confirmation");
       }
     };
-
+    
     if (orderId) fetchOrder();
   }, []);
-
+  
+  console.log(order)
   if (!order) return <p>Loading order information...</p>;
 
   return (
@@ -43,12 +44,12 @@ export const OrderConfirmation = () => {
         <strong>Payment:</strong> {order.payment_status}
       </p>
 
-      {/* <hr style={{ margin: "1rem 0" }} /> */}
+      <hr style={{ margin: "1rem 0" }} />
 
-      {/* <h2>Customer</h2> */}
-      {/* <p> {order.customer.last_name}</p>
+      <h2>Customer</h2>
+      <p> {order.customer.last_name}</p>
       <p>{order.customer.email}</p>
-      <p>{order.customer.street_address}, {order.customer.zip_code} {order.customer.city}</p> */}
+      <p>{order.customer.street_address}, {order.customer.zip_code} {order.customer.city}</p>
 
       <hr style={{ margin: "1rem 0" }} />
 

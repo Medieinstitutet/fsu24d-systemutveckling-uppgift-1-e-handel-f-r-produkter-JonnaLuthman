@@ -45,7 +45,10 @@ export const getOrderById = async (req, res) => {
 };
 
 export const createOrder = async (req, res) => {
+  console.log("createOrder running1 ")
   const { cart_id, customer_id, payment_status, order_status } = req.body;
+
+  console.log("createOrder running2 req body ", req.body)
 
   if (!cart_id || !customer_id || !payment_status || !order_status) {
     return res.status(400).send({
@@ -53,7 +56,7 @@ export const createOrder = async (req, res) => {
         "Cart ID, customer ID, payment status, and order status are required.",
     });
   }
-
+  console.log("createOrder running 3 ")
   try {
     const cart = await cartModel.findById(cart_id);
     if (!cart || !cart.cartItems || cart.cartItems.length === 0) {
@@ -65,10 +68,11 @@ export const createOrder = async (req, res) => {
       0
     );
 
-    const customerId = toObjectId(customer_id)
+    const customerObjectId = toObjectId(customer_id)
 
+      console.log("createOrder running1 customer_id", customer_id)
     const newOrder = addTimestamps({
-      customerId,
+      customer_id: customerObjectId,
       total_price,
       payment_status,
       order_status,
