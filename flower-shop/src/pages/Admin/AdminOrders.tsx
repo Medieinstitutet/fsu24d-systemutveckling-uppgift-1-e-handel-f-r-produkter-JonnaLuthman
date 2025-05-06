@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { OrderWithDetails } from "../../types/Order";
 import { useOrders } from "../../hooks/useOrders";
-import "../../styles/adminOrdersPage.css";
+import "../../styles/adminOrders.css";
 
 export const AdminOrders = () => {
   const [orders, setOrders] = useState<OrderWithDetails[]>([]);

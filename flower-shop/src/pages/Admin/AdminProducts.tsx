@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useProducts } from "../../hooks/useProducts";
 import { Product, ProductCreate } from "../../types/Product";
-import "../../styles/adminProductsPage.css"
+import "../../styles/adminGeneral.css";
 
 export default function AdminProductPage() {
   const {
@@ -68,7 +68,7 @@ export default function AdminProductPage() {
                 <label>
                   Title
                   <input
-                  required 
+                    required
                     value={editProduct.title}
                     onChange={(e) =>
                       setEditProduct({ ...editProduct, title: e.target.value })
@@ -78,7 +78,7 @@ export default function AdminProductPage() {
                 <label>
                   Price
                   <input
-                  required 
+                    required
                     type="number"
                     value={editProduct.price}
                     onChange={(e) =>
@@ -92,8 +92,7 @@ export default function AdminProductPage() {
                 <label>
                   Stock
                   <input
-                 
-                  required 
+                    required
                     type="number"
                     value={editProduct.stock}
                     onChange={(e) =>
@@ -107,8 +106,8 @@ export default function AdminProductPage() {
                 <label>
                   Description
                   <textarea
-
-required value={editProduct.description}
+                    required
+                    value={editProduct.description}
                     onChange={(e) =>
                       setEditProduct({
                         ...editProduct,
@@ -117,8 +116,8 @@ required value={editProduct.description}
                     }
                   />
                 </label>
-                <button onClick={handleUpdate}>Save</button>
-                <button onClick={() => setEditProduct(null)}>Cancel</button>
+                <button className="admin-button" onClick={handleUpdate}>Save</button>
+                <button className="admin-button" onClick={() => setEditProduct(null)}>Cancel</button>
               </div>
             ) : (
               <div>
@@ -129,8 +128,8 @@ required value={editProduct.description}
                 <p>
                   {product.price} kr | Stock: {product.stock}
                 </p>
-                <button onClick={() => setEditProduct(product)}>Edit</button>
-                <button onClick={() => handleDelete(product._id)}>
+                <button className="admin-button" onClick={() => setEditProduct(product)}>Edit</button>
+                <button className="admin-button" onClick={() => handleDelete(product._id)}>
                   Delete
                 </button>
               </div>
@@ -144,7 +143,7 @@ required value={editProduct.description}
         <label>
           Title
           <input
-          placeholder= "tile"
+            placeholder="tile"
             value={newProduct.title}
             onChange={(e) =>
               setNewProduct({ ...newProduct, title: e.target.value })
@@ -154,7 +153,7 @@ required value={editProduct.description}
         <label>
           Price
           <input
-          placeholder="price"
+            placeholder="price"
             type="number"
             value={newProduct.price}
             onChange={(e) =>
@@ -165,7 +164,7 @@ required value={editProduct.description}
         <label>
           Stock
           <input
-          placeholder="stock"
+            placeholder="stock"
             type="number"
             value={newProduct.stock}
             onChange={(e) =>
@@ -176,7 +175,7 @@ required value={editProduct.description}
         <label>
           Description
           <textarea
-          placeholder="description"
+            placeholder="description"
             value={newProduct.description}
             onChange={(e) =>
               setNewProduct({ ...newProduct, description: e.target.value })

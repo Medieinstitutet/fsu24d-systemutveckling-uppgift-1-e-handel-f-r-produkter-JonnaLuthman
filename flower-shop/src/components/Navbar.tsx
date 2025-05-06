@@ -8,12 +8,13 @@ export const Navbar = () => {
         <li><Link to="/">Home</Link></li>
         <li><Link to="/products">Products</Link></li>
         <li><Link to="/contact-us">Contact us</Link></li>
-        <li className="dropdown">
+        <li className="dropdown"><Link to={"/admin"}>
           <span className="dropdown-toggle">Admin ▼</span>
           <ul className="dropdown-content">
             <li><Link to="/admin/orders">Orders</Link></li>
             <li><Link to="/admin/products">Products</Link></li>
           </ul>
+          </Link>
         </li>
 
         <li className='cart-link'><Link to="/checkout">Cart</Link></li>

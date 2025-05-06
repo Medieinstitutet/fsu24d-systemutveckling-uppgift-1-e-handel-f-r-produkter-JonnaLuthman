@@ -3,6 +3,7 @@ import { useProducts } from "../hooks/useProducts.ts";
 import { Product } from "../types/Product.ts";
 import { CartItemCreate } from "../types/CartItem.ts";
 import { useCart } from "../hooks/useCart.ts";
+import "../styles/productsPage.css"
 
 export const Products = () => {
   const [products, setProducts] = useState<Product[]>([]);
@@ -20,11 +21,9 @@ export const Products = () => {
         console.error(error);
       }
     };
-    
+
     loadProducts();
   }, [products]);
-  
-  console.log(products)
   if (error) {
     return <p>{error}</p>;
   }
@@ -43,24 +42,29 @@ export const Products = () => {
   };
 
   return (
-    <div>
+    <div className="product-list">
       <h1>Products</h1>
+
       {products.length === 0 ? (
         <p>No products found.</p>
       ) : (
-        <ul>
+        <ul className="product-grid">
           {products.map((product) => (
-            <li key={product._id}>
-              <strong>{product.title}</strong> – {product.price} sek <br />
-              Stock: {product.stock} <br />
-              {product.description}
-              <button
-                onClick={() => {
-                  handleClick(product._id, product.price);
-                }}
-              >
-                Add to cart
-              </button>
+            <li key={product._id} className="product-card">
+              <img
+                src="https://source.unsplash.com/400x300/?flower" // temporär bild
+                alt="Product placeholder"
+                className="product-image"
+              />
+              <div className="product-info">
+                <h3>{product.title}</h3>
+                <p>{product.price} sek</p>
+                <p>Stock: {product.stock}</p>
+                <p className="product-description">{product.description}</p>
+                <button onClick={() => handleClick(product._id, product.price)}>
+                  Add to cart
+                </button>
+              </div>
             </li>
           ))}
         </ul>
