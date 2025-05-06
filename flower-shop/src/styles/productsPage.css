@@ -48,14 +48,11 @@
   button {
     margin-top: auto;
     padding: 0.5rem 1rem;
-    background-color: #0070f3;
-    color: white;
+    background-color: #e388eb;
+    color: rgb(0, 0, 0);
     border: none;
     border-radius: 4px;
     cursor: pointer;
   }
-  
-  button:hover {
-    background-color: #005bb5;
-  }
+
   
