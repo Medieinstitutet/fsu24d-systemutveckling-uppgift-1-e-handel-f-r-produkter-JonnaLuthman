@@ -28,9 +28,6 @@ export const PaypalCheckoutButton = ({ cart, customer_id }: ICartProps) => {
   const { createOrderHandler } = useOrders();
   const navigate = useNavigate();
 
-  console.log("customer_id", customer_id, "cart", cart);
-  console.log("Paypal button init", { cart, customer_id });
-
   useEffect(() => {
     if (!cart || cart.length === 0) return;
 
@@ -72,7 +69,6 @@ export const PaypalCheckoutButton = ({ cart, customer_id }: ICartProps) => {
           }
         },
         async onApprove(data: PaypalResponse) {
-          console.log("onApprove data", data);
           try {
             const response = await axios.post(
               `/api/paypal/${data.orderID}/capture`
@@ -88,7 +84,6 @@ export const PaypalCheckoutButton = ({ cart, customer_id }: ICartProps) => {
 
             try {
               const result = await createOrderHandler(payload);
-              console.log("result", result);
               const transaction =
                 orderData?.purchase_units?.[0]?.payments?.captures?.[0];
 

@@ -28,7 +28,6 @@ export const CartSummary = ({ onCartReady }: Props) => {
     const getCart = async () => {
       const data: Cart = await handleFetchCart(cartId);
       const cartItems: CartItemWithDetails[] = data.cartItems;
-      console.log("cartItems", cartItems);
       setCart(cartItems);
     };
     getCart();
@@ -90,7 +89,6 @@ export const CartSummary = ({ onCartReady }: Props) => {
   const handleRemoveFromCart = async (productId: string) => {
     if (!cartId) return;
     const data = await removeCartItem(cartId, productId);
-    console.log("handleRemoveData", data);
     setCart(data.cartItems);
   };
 
