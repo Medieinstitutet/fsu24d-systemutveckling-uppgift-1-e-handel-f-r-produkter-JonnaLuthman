@@ -6,12 +6,13 @@ import { getFromLocalStorage } from "../../utils/localStorage.ts";
 import { removeCartItem } from "../../services/cartService.js";
 import { calculateCartTotal } from "../../utils/calculateCartTotal.ts";
 import { Cart } from "../../types/Cart.ts";
+import "../../styles/cartSummary.css"
 
 interface Props {
   onCartReady: (items: Cart) => void;
 }
 
-export const CartSummary = ({onCartReady} : Props) => {
+export const CartSummary = ({ onCartReady }: Props) => {
   const { handleFetchCart, handleUpdateCartItem } = useCart();
   const [cart, setCart] = useState<CartItemWithDetails[] | null>(null);
   const [cartId, setCartId] = useState<string | null>(null);
@@ -26,17 +27,16 @@ export const CartSummary = ({onCartReady} : Props) => {
     if (!cartId) return;
     const getCart = async () => {
       const data: Cart = await handleFetchCart(cartId);
-      const cartItems = data.cartItems
-      console.log("cartItems",cartItems)
+      const cartItems = data.cartItems;
+      console.log("cartItems", cartItems);
       setCart(cartItems);
-
     };
     getCart();
   }, [cartId]);
 
   useEffect(() => {
     if (cart) {
-      onCartReady(cart)
+      onCartReady(cart);
       setTotalSum(calculateCartTotal(cart));
     }
   }, [cart]);
@@ -90,7 +90,7 @@ export const CartSummary = ({onCartReady} : Props) => {
   const handleRemoveFromCart = async (productId: string) => {
     if (!cartId) return;
     const data = await removeCartItem(cartId, productId);
-    console.log("handleRemoveData",data)
+    console.log("handleRemoveData", data);
     setCart(data.cartItems);
   };
 
@@ -98,12 +98,12 @@ export const CartSummary = ({onCartReady} : Props) => {
   // const handleResetCart = async () => {}
 
   return (
-    <div>
+    <div className="cart-summary">
       {cart?.length === 0 ? (
-        <div>
+        <div className="empty-cart">
           <p>Your bag is empty</p>
           <Link to={"/products"}>
-            <button>Find our products here</button>
+            <button className="btn">Find our products here</button>
           </Link>
         </div>
       ) : (
@@ -111,14 +111,14 @@ export const CartSummary = ({onCartReady} : Props) => {
           <h2>Shopping Cart</h2>
           <div>
             {cart?.map((cartItem: CartItemWithDetails) => (
-              <ul key={cartItem.product._id}>
-                <li>
-                  <div>
+              <ul key={cartItem.product._id} className="cart-item-list">
+                <li className="cart-item">
+                  <div className="cart-item-content">
                     <div>
-                      <p>{cartItem.product.title}</p>
+                      <p className="item-title">{cartItem.product.title}</p>
                     </div>
 
-                    <div>
+                    <div className="item-controls">
                       <p>{cartItem.price} sek</p>
                       <button
                         onClick={() =>
@@ -144,7 +144,7 @@ export const CartSummary = ({onCartReady} : Props) => {
                     </div>
                   </div>
 
-                  <div>
+                  <div className="remove-button">
                     <button
                       onClick={() => handleRemoveFromCart(cartItem.product._id)}
                       type="button"
@@ -155,14 +155,13 @@ export const CartSummary = ({onCartReady} : Props) => {
                 </li>
               </ul>
             ))}
-            {/* <button onClick={handleResetCart}>Empty cart</button> */}
-            <div>
+
+            <div className="cart-total">
               <p>Total</p>
               <p>
-                <span> {totalSum} sek</span>
+                <strong>{totalSum} sek</strong>
               </p>
             </div>
-
           </div>
         </div>
       )}
