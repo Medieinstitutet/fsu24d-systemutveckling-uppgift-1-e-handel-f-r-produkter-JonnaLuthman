@@ -9,6 +9,7 @@ import {
   LogLevel,
   OrdersController,
 } from "@paypal/paypal-server-sdk";
+import { toObjectId } from "../utils/toObjectId.js";
 
 const orderModel = new Order();
 const orderItemModel = new OrderItem();
@@ -64,8 +65,10 @@ export const createOrder = async (req, res) => {
       0
     );
 
+    const customerId = toObjectId(customer_id)
+
     const newOrder = addTimestamps({
-      customer_id,
+      customerId,
       total_price,
       payment_status,
       order_status,
@@ -81,12 +84,9 @@ export const createOrder = async (req, res) => {
       price: item.price,
     }));
 
-    console.log(orderItemsData);
-
     const result = await orderItemModel.createItems(orderItemsData);
-    console.log(result);
 
-    // await cartModel.delete(cart_id);
+    await cartModel.delete(cart_id);
 
     res.send({
       message: "Order created successfully",

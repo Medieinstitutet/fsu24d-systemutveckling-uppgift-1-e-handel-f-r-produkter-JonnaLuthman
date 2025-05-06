@@ -114,18 +114,18 @@ export const PaypalCheckoutButton = ({ cart, customerId }: ICartProps) => {
 
 <ul>
   {cart?.map((item) => (
-    <li key={item._id}>
+    <div key={item._id}>
       <p><strong>{item.productId}</strong></p>
       <p>Quantity: {item.quantity}</p>
       <p>Price per item: {item.price} kr</p>
       <p>Subtotal: {item.price * item.quantity} kr</p>
       <hr />
-    </li>
+    </div>
   ))}
 
-  <li>
+  <div>
     <p><strong>Total:</strong> {cart?.reduce((total, item) => total + item.price * item.quantity, 0)} kr</p>
-  </li>
+  </div>
 </ul>
       <div ref={paypal}></div>
     </div>

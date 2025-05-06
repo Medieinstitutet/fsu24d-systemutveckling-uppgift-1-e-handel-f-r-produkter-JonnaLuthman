@@ -56,18 +56,19 @@ export default function AdminProductPage() {
     <div className="admin-container">
       <h1>Admin</h1>
       <h2>Product Management</h2>
-
       {error && <p className="error">{error}</p>}
 
       <h2>All Products</h2>
       <div className="product-list">
         {products.map((product) => (
           <div key={product._id} className="product-card">
+            <hr style={{ margin: "1rem 0" }} />
             {editProduct?._id === product._id ? (
               <div className="edit-form">
                 <label>
                   Title
                   <input
+                  required 
                     value={editProduct.title}
                     onChange={(e) =>
                       setEditProduct({ ...editProduct, title: e.target.value })
@@ -77,6 +78,7 @@ export default function AdminProductPage() {
                 <label>
                   Price
                   <input
+                  required 
                     type="number"
                     value={editProduct.price}
                     onChange={(e) =>
@@ -90,6 +92,8 @@ export default function AdminProductPage() {
                 <label>
                   Stock
                   <input
+                 
+                  required 
                     type="number"
                     value={editProduct.stock}
                     onChange={(e) =>
@@ -103,7 +107,8 @@ export default function AdminProductPage() {
                 <label>
                   Description
                   <textarea
-                    value={editProduct.description}
+
+required value={editProduct.description}
                     onChange={(e) =>
                       setEditProduct({
                         ...editProduct,
@@ -120,6 +125,7 @@ export default function AdminProductPage() {
                 <p>
                   <strong>{product.title}</strong>
                 </p>
+                <p>{product.description}</p>
                 <p>
                   {product.price} kr | Stock: {product.stock}
                 </p>
@@ -138,6 +144,7 @@ export default function AdminProductPage() {
         <label>
           Title
           <input
+          placeholder= "tile"
             value={newProduct.title}
             onChange={(e) =>
               setNewProduct({ ...newProduct, title: e.target.value })
@@ -147,6 +154,7 @@ export default function AdminProductPage() {
         <label>
           Price
           <input
+          placeholder="price"
             type="number"
             value={newProduct.price}
             onChange={(e) =>
@@ -157,6 +165,7 @@ export default function AdminProductPage() {
         <label>
           Stock
           <input
+          placeholder="stock"
             type="number"
             value={newProduct.stock}
             onChange={(e) =>
@@ -167,6 +176,7 @@ export default function AdminProductPage() {
         <label>
           Description
           <textarea
+          placeholder="description"
             value={newProduct.description}
             onChange={(e) =>
               setNewProduct({ ...newProduct, description: e.target.value })
