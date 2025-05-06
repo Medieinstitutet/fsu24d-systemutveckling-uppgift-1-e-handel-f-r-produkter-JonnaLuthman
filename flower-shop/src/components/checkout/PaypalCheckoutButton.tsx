@@ -7,7 +7,7 @@ declare global {
     paypal: any;
   }
 }
-import { CartItem } from "../../types/CartItem";
+import { CartItemWithDetails } from "../../types/CartItem";
 import { useOrders } from "../../hooks/useOrders";
 import { OrderCreate } from "../../types/Order";
 import {
@@ -16,13 +16,14 @@ import {
 } from "../../utils/localStorage";
 import { useNavigate } from "react-router";
 import { calculateCartTotal } from "../../utils/calculateCartTotal";
+import { PaypalResponse } from "../../types/ApiResponse";
 
 interface ICartProps {
-  cart: CartItem[] | null;
-  customerId: string;
+  cart: CartItemWithDetails[] | null;
+  customer_id: string;
 }
 
-export const PaypalCheckoutButton = ({ cart, customerId }: ICartProps) => {
+export const PaypalCheckoutButton = ({ cart, customer_id }: ICartProps) => {
   const paypal = useRef(null);
   const { createOrderHandler } = useOrders();
   const navigate = useNavigate();
@@ -40,7 +41,7 @@ export const PaypalCheckoutButton = ({ cart, customerId }: ICartProps) => {
         },
         async createOrder() {
           const totalAmount = calculateCartTotal(cart);
-          
+
           const payload = {
             cart: cart.map((item) => ({
               product_id: item.productId,
@@ -67,7 +68,7 @@ export const PaypalCheckoutButton = ({ cart, customerId }: ICartProps) => {
             console.error("Error creating PayPal order:", error);
           }
         },
-        async onApprove(data) {
+        async onApprove(data: PaypalResponse) {
           try {
             const response = await axios.post(
               `/api/paypal/${data.orderID}/capture`
@@ -76,14 +77,13 @@ export const PaypalCheckoutButton = ({ cart, customerId }: ICartProps) => {
             const orderData = response.data;
             const payload: OrderCreate = {
               cart_id: await getFromLocalStorage("cartId"),
-              customer_id: customerId,
+              customer_id: customer_id,
               payment_status: "Paid",
               order_status: "Created",
             };
 
             try {
               const result = await createOrderHandler(payload);
-              console.log("result", result);
               const transaction =
                 orderData?.purchase_units?.[0]?.payments?.captures?.[0];
 
@@ -105,29 +105,7 @@ export const PaypalCheckoutButton = ({ cart, customerId }: ICartProps) => {
         },
       })
       .render(paypal.current);
-  }, [cart, createOrderHandler]);
+  }, [cart, , customer_id, createOrderHandler]);
 
-  return (
-    <div>
-
-<h2>This is your order</h2>
-
-<ul>
-  {cart?.map((item) => (
-    <div key={item._id}>
-      <p><strong>{item.productId}</strong></p>
-      <p>Quantity: {item.quantity}</p>
-      <p>Price per item: {item.price} kr</p>
-      <p>Subtotal: {item.price * item.quantity} kr</p>
-      <hr />
-    </div>
-  ))}
-
-  <div>
-    <p><strong>Total:</strong> {cart?.reduce((total, item) => total + item.price * item.quantity, 0)} kr</p>
-  </div>
-</ul>
-      <div ref={paypal}></div>
-    </div>
-  );
+  return <div ref={paypal}></div>;
 };

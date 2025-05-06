@@ -4,7 +4,7 @@ import { CustomerCreate } from "../../types/Customer.js";
 import "../../styles/customerForm.css";
 
 interface Props {
-  onCustomerCreated: (customerId: string) => void;
+  onCustomerCreated: (customer_id: string) => void;
 }
 
 export const CustomerForm = ({ onCustomerCreated }: Props) => {
@@ -28,10 +28,11 @@ export const CustomerForm = ({ onCustomerCreated }: Props) => {
 
     try {
       const response = await createCustomer(formData);
-      const customerId = response.id;
+      const customer_id = response.id;
 
-      if (customerId) {
-        onCustomerCreated(customerId);
+      if (customer_id) {
+        console.log("customer_id", customer_id)
+        onCustomerCreated(customer_id);
       } else {
         console.error("Response missing customer_id");
       }

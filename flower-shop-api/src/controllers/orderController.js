@@ -32,7 +32,6 @@ export const getOrderById = async (req, res) => {
   const id = req.params.id;
   try {
     const order = await orderModel.findByIdWithDetails(id);
-    console.log("order in fetchOrderbyID", order)
     if (!order) {
       return res.status(404).send({ error: "Order not found" });
     }
@@ -53,7 +52,6 @@ export const createOrder = async (req, res) => {
         "Cart ID, customer ID, payment status, and order status are required.",
     });
   }
-
   try {
     const cart = await cartModel.findById(cart_id);
     if (!cart || !cart.cartItems || cart.cartItems.length === 0) {
@@ -65,10 +63,9 @@ export const createOrder = async (req, res) => {
       0
     );
 
-    const customerId = toObjectId(customer_id)
-
+    const customerObjectId = toObjectId(customer_id);
     const newOrder = addTimestamps({
-      customerId,
+      customer_id: customerObjectId,
       total_price,
       payment_status,
       order_status,

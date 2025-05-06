@@ -9,6 +9,7 @@ export type CartItem = {
 };
 
 export type CartItemWithDetails = {
+  productId: string,
   product: Product;
   quantity: number;
   price: number;

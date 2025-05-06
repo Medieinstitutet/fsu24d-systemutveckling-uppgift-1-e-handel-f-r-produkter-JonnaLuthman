@@ -52,8 +52,6 @@ export const Products = () => {
           {products.map((product) => (
             <li key={product._id} className="product-card">
               <img
-                src="https://source.unsplash.com/400x300/?flower" // temporär bild
-                alt="Product placeholder"
                 className="product-image"
               />
               <div className="product-info">
